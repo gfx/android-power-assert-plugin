@@ -2,7 +2,9 @@ package com.github.gfx.debugassert
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.api.ApkVariant
 import com.android.build.gradle.api.ApplicationVariant
+import groovy.io.FileType
 import javassist.CannotCompileException
 import javassist.ClassPool
 import javassist.CtClass
@@ -27,7 +29,12 @@ public class DebugAssertPlugin implements Plugin<Project> {
         AppExtension android = project.android;
         android.applicationVariants.all { ApplicationVariant variant ->
             if (variant.buildType.name != "release") {
-                variant.dex.dependsOn << createTask(variant)
+                variant.javaCompile.doLast {
+                    enableDebugAssert(variant.javaCompile.destinationDir)
+                }
+                variant.testVariant.javaCompile.doLast {
+                    enableDebugAssert(variant.testVariant.javaCompile.destinationDir)
+                }
             }
         }
     }
@@ -36,12 +43,11 @@ public class DebugAssertPlugin implements Plugin<Project> {
         return s.substring(0, 1).toUpperCase() + s.substring(1)
     }
 
-    private Task createTask(ApplicationVariant variant) {
+    private Task createTask(ApkVariant variant) {
         Task task = project.tasks.create("enable${ucfirst(variant.name)}Assert")
         task.description = "Enables assert statements (equivalent to setting debug.assert true in Dalvik VM)"
         task.doLast {
-            String buildDir = "build/classes/${variant.flavorName}/${variant.buildType.name}"
-            enableDebugAssert(buildDir)
+            enableDebugAssert(variant.javaCompile.destinationDir)
         }
 
         return task
@@ -53,7 +59,7 @@ public class DebugAssertPlugin implements Plugin<Project> {
         }
     }
 
-    private void enableDebugAssert(String buildDir) {
+    private void enableDebugAssert(File buildDir) {
         long t0 = System.currentTimeMillis()
 
         ClassPool classPool = ClassPool.getDefault()
@@ -62,7 +68,7 @@ public class DebugAssertPlugin implements Plugin<Project> {
             classPool.appendClassPath(androidJar)
         }
 
-        def absoluteBuildDir = project.file(buildDir).canonicalPath
+        String absoluteBuildDir = buildDir.canonicalPath
         info "buildDir=$absoluteBuildDir"
 
         classPool.appendClassPath(absoluteBuildDir)
@@ -70,7 +76,14 @@ public class DebugAssertPlugin implements Plugin<Project> {
         def allCount = 0;
         def processedCount = 0;
 
-        project.fileTree(dir: buildDir, include: "**/*.class").collect { File classFile ->
+        def classFiles = new ArrayList<File>()
+        buildDir.eachFileRecurse(FileType.FILES) { File file ->
+            if (file.name.endsWith(".class")) {
+                classFiles.add(file)
+            }
+        }
+
+        classFiles.collect { File classFile ->
             assert classFile.absolutePath.startsWith(absoluteBuildDir)
 
             def path = classFile.absolutePath.substring(absoluteBuildDir.length() + 1 /* for a path separator */)
@@ -88,7 +101,9 @@ public class DebugAssertPlugin implements Plugin<Project> {
                 }
             })
 
-            c.writeFile(absoluteBuildDir)
+            if (processedCount > 0) {
+                c.writeFile(absoluteBuildDir)
+            }
             allCount++
         }
 
@@ -96,6 +111,7 @@ public class DebugAssertPlugin implements Plugin<Project> {
     }
 
     private void info(String message) {
+        println "[DebugAssert] $message"
         project.logger.info "[DebugAssert] $message"
     }
 
