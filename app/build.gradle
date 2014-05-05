@@ -1,12 +1,5 @@
 apply plugin: 'android'
-
-task('processWithJavassist') << {
-    //String path = file('build/classes/debug/com/github/gfx/javassistexample/app/MainActivity.class')
-    String classPath = file('build/classes/debug')
-    com.github.gfx.javassistexamp.JavassistExample.process(classPath)
-
-}
-
+apply plugin: com.github.gfx.javassistexamp.EnableDebugAssert
 
 android {
     compileSdkVersion 19
@@ -28,11 +21,6 @@ android {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
-    }
-
-
-    applicationVariants.all { variant ->
-        variant.dex.dependsOn << processWithJavassist
     }
 }
 
