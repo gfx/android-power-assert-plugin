@@ -1,5 +1,5 @@
 apply plugin: 'android'
-apply plugin: com.github.gfx.javassistexamp.EnableDebugAssert
+apply plugin: 'android-debug-assert'
 
 android {
     compileSdkVersion 19

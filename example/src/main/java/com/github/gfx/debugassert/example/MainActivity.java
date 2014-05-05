@@ -1,4 +1,4 @@
-package com.github.gfx.javassistexample.app;
+package com.github.gfx.debugassert.example;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -15,6 +15,6 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        assert false;
+        Foo.f(false);
     }
 }

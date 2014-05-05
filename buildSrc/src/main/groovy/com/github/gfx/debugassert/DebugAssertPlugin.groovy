@@ -1,4 +1,4 @@
-package com.github.gfx.javassistexamp
+package com.github.gfx.debugassert
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
@@ -15,7 +15,7 @@ import org.gradle.api.tasks.StopExecutionException
 
 // see http://www.gradle.org/docs/current/userguide/custom_plugins.html
 
-public class EnableDebugAssert implements Plugin<Project> {
+public class DebugAssertPlugin implements Plugin<Project> {
     private Project project;
 
     @Override
