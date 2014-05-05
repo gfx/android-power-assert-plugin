@@ -90,24 +90,29 @@ public class DebugAssertPlugin implements Plugin<Project> {
             path.substring(0, path.lastIndexOf(".class")).replace("/", ".")
         }.each { className ->
             CtClass c = classPool.getCtClass(className)
-            c.getClassInitializer()?.instrument(new ExprEditor() {
-                @Override
-                void edit(MethodCall m) throws CannotCompileException {
-                    if (m.className == "java.lang.Class" && m.methodName == "desiredAssertionStatus") {
-                        m.replace('{ $_ = ($r)true; }')
-                        info("Enables assertions in ${c.name}")
-                        processedCount++
-                    }
-                }
-            })
-
-            if (processedCount > 0) {
+            if (modifyStatements(c)) {
+                info("Enables assertions in ${c.name}")
+                processedCount++
                 c.writeFile(absoluteBuildDir)
             }
             allCount++
         }
 
         info("Processed $processedCount/$allCount classes, elapsed ${System.currentTimeMillis() - t0}ms")
+    }
+
+    private boolean modifyStatements(CtClass c) {
+        boolean modified = false;
+        c.getClassInitializer()?.instrument(new ExprEditor() {
+            @Override
+            void edit(MethodCall m) throws CannotCompileException {
+                if (m.className == "java.lang.Class" && m.methodName == "desiredAssertionStatus") {
+                    m.replace('{ $_ = ($r)true; }')
+                    modified = true
+                }
+            }
+        })
+        return modified;
     }
 
     private void info(String message) {
