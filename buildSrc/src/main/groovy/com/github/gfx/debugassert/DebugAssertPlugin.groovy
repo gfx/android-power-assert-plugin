@@ -26,7 +26,9 @@ public class DebugAssertPlugin implements Plugin<Project> {
 
         AppExtension android = project.android;
         android.applicationVariants.all { ApplicationVariant variant ->
-            variant.dex.dependsOn << createTask(variant)
+            if (variant.buildType.name != "release") {
+                variant.dex.dependsOn << createTask(variant)
+            }
         }
     }
 
