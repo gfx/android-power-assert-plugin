@@ -10,6 +10,5 @@ dependencies {
     compile localGroovy()
     compile 'com.android.tools.build:gradle:0.10.+'
 
-    //compile 'org.javassist:javassist:3.18.+'
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'org.javassist:javassist:3.18.+'
 }
