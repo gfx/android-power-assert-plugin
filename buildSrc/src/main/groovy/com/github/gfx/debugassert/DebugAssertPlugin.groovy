@@ -10,6 +10,7 @@ import groovy.io.FileType
 import javassist.CannotCompileException
 import javassist.ClassPool
 import javassist.CtClass
+import javassist.CtField
 import javassist.CtMethod
 import javassist.bytecode.*
 import javassist.expr.*
@@ -23,12 +24,16 @@ import org.gradle.api.Project
 public class DebugAssertPlugin implements Plugin<Project> {
     private static final String kPowerAssertMessage = '$powerAssertMessage'
 
+    /**
+     * Runtime libraries this plugin depends on
+     */
     public static List<String> DEPENDENCIES = ['org.apache.commons:commons-lang3:+']
 
     private Project project;
 
     private ClassPool classPool
     private CtClass stringBuilderClass
+    private CtClass runtimeExceptinClass
 
     @Override
     void apply(Project project) {
@@ -38,6 +43,7 @@ public class DebugAssertPlugin implements Plugin<Project> {
 
         classPool = ClassPool.default
         stringBuilderClass = classPool.getCtClass("java.lang.StringBuilder")
+        runtimeExceptinClass = classPool.getCtClass("java.lang.RuntimeException")
 
         project.dependencies.androidTestCompile(DEPENDENCIES)
 
@@ -149,12 +155,23 @@ dependencies {
         })
 
         if (modified) {
-            c.getDeclaredMethods().each { CtMethod method ->
-                // TODO: lazy initialization?
-                method.addLocalVariable(kPowerAssertMessage, stringBuilderClass)
-                method.insertBefore("$kPowerAssertMessage = new StringBuilder();")
+            // FIXME: kPowerAssertMessage is NOT thread safe
+            c.addField(CtField.make("private static final StringBuilder ${kPowerAssertMessage} = new StringBuilder();", c))
 
+            c.getDeclaredMethods().each { CtMethod method ->
+                method.insertBefore("${kPowerAssertMessage}.setLength(0);")
+
+                def editor = new EditAssertStatement(method)
                 method.instrument(new EditAssertStatement(method))
+
+                if (editor.hasAssertStatement) {
+                    def catchSrc = String.format('''{
+throw new RuntimeException(%1$s.toString(), (Throwable)$e);
+}''',
+                        kPowerAssertMessage
+                    )
+                    method.addCatch(catchSrc, runtimeExceptinClass)
+                }
             }
         }
         return modified;
@@ -163,21 +180,26 @@ dependencies {
     private class EditAssertStatement extends ExprEditor {
         final CtMethod method;
 
-        boolean inAssertStatement = false;
+        boolean inAssertStatement = false
+
+        public boolean hasAssertStatement = false;
 
         EditAssertStatement(CtMethod method) {
-            this.method = method;
+            this.method = method
         }
 
         @Override
         void edit(FieldAccess f) throws CannotCompileException {
             if (inAssertStatement) {
-                f.replace(buildFieldInformation(f))
+                def src = buildFieldInformation(f)
+                info src
+                f.replace(src)
             }
 
             if (f.static && f.fieldName == '$assertionsDisabled') {
                 info "assert statement found at ${f.fileName}:${f.lineNumber}"
                 inAssertStatement = true
+                hasAssertStatement = true
             }
         }
 
@@ -198,7 +220,7 @@ $_ = $proceed();
 %1$s.append("\\n");
 }''',
                 kPowerAssertMessage,
-                makeLiteral("${expr.className}#${expr.fieldName}=")
+                makeLiteral("${expr.className}.${expr.fieldName}=")
             )
         }
 
@@ -266,11 +288,9 @@ $_ = $proceed();
 StringBuilder _s = new StringBuilder(%2$s);
 _s.append("LOCAL VARIABLES:\\n");
 %3$s
-_s.append("TEMPORARY VALUES:\\n");
-_s.append("\\n");
+_s.append("\\nTEMPORARY VALUES:\\n");
 _s.append(%1$s);
 
-%1$s.setLength(0);
 $_ = $proceed((Object)_s);
 }''', kPowerAssertMessage, messagePrefix, localVars);
             info src
