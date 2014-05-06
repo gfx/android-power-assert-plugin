@@ -7,11 +7,7 @@ import com.android.build.gradle.api.ApplicationVariant
 import com.android.builder.DefaultBuildType
 import com.android.builder.model.BuildType
 import groovy.io.FileType
-import javassist.CannotCompileException
-import javassist.ClassPool
-import javassist.CtClass
-import javassist.CtField
-import javassist.CtMethod
+import javassist.*
 import javassist.bytecode.*
 import javassist.expr.*
 import org.apache.commons.lang3.StringEscapeUtils
@@ -107,6 +103,7 @@ dependencies {
         }
 
         classPool.importPackage("org.apache.commons.lang3.builder")
+        classPool.importPackage("org.apache.commons.lang3")
 
         String absoluteBuildDir = buildDir.canonicalPath
         info "buildDir=$absoluteBuildDir"
@@ -162,11 +159,12 @@ dependencies {
                 method.insertBefore("${kPowerAssertMessage}.setLength(0);")
 
                 def editor = new EditAssertStatement(method)
-                method.instrument(new EditAssertStatement(method))
+                method.instrument(editor)
 
                 if (editor.hasAssertStatement) {
+                    info "add try-catch for RuntimeException in ${method.name}() to catch NPE"
                     def catchSrc = String.format('''{
-throw new RuntimeException(%1$s.toString(), (Throwable)$e);
+throw new RuntimeException("possible causes:\\n" + %1$s, (Throwable)$e);
 }''',
                         kPowerAssertMessage
                     )
@@ -204,6 +202,17 @@ throw new RuntimeException(%1$s.toString(), (Throwable)$e);
         }
 
         @Override
+        void edit(MethodCall m) throws CannotCompileException {
+            if (inAssertStatement) {
+                def src = buildMethodResultInformation(m)
+                if (src != null) {
+                    info src
+                    m.replace(src)
+                }
+            }
+        }
+
+        @Override
         void edit(NewExpr e) throws CannotCompileException {
             if (inAssertStatement && e.className == "java.lang.AssertionError") {
                 injectVariableInformation(e)
@@ -214,13 +223,32 @@ throw new RuntimeException(%1$s.toString(), (Throwable)$e);
         String buildFieldInformation(FieldAccess expr) {
             return String.format(
                 '''{
-$_ = $proceed();
+$_ = $proceed($$);
 %1$s.append(%2$s);
-%1$s.append($_);
+%1$s.append(%3$s);
 %1$s.append("\\n");
 }''',
                 kPowerAssertMessage,
-                makeLiteral("${expr.className}.${expr.fieldName}=")
+                makeLiteral("${expr.className}.${expr.fieldName}="),
+                inspectExpr('$_', Descriptor.toCtClass(expr.signature, classPool))
+            )
+        }
+
+        String buildMethodResultInformation(MethodCall expr) {
+            def returnType = Descriptor.getReturnType(expr.signature, classPool)
+            if (returnType == CtClass.voidType) {
+                return null
+            }
+            return String.format(
+                '''{
+$_ = $proceed($$);
+%1$s.append(%2$s);
+%1$s.append(%3$s);
+%1$s.append("\\n");
+}''',
+                kPowerAssertMessage,
+                makeLiteral("${expr.className}.${expr.methodName}()="),
+                inspectExpr('$_', returnType)
             )
         }
 
@@ -251,10 +279,7 @@ $_ = $proceed();
 
                     info "${lines.lineNumber(vars.index(i))}: ${varType.simpleName} ${name}"
 
-                    def exprToDump = name
-                    if (!varType.isPrimitive()) {
-                        exprToDump = "ToStringBuilder.reflectionToString((Object)${exprToDump}, ToStringStyle.SHORT_PREFIX_STYLE)"
-                    }
+                    def exprToDump = inspectExpr(name, varType)
 
                     // _s is a local StringBuilder for this `new AssertionError()` expression
                     s.append("_s.append(${makeLiteral("${name}=")});\n")
@@ -264,6 +289,23 @@ $_ = $proceed();
             }
 
             return s
+        }
+
+        String inspectExpr(String expr, CtClass type) {
+            if (type.isPrimitive()) {
+                return expr;
+            } else {
+                def makeStringLiteral = String.format('("\\"" + StringEscapeUtils.escapeJava((String)%s) + "\\"")', expr)
+                def inspect = String.format('ToStringBuilder.reflectionToString((Object)%s, ToStringStyle.SHORT_PREFIX_STYLE)', expr)
+
+                if (type.name == "java.lang.String") {
+                    return makeStringLiteral
+                } else if (type.name == "java.lang.Object") {
+                    return "${expr}.getClass() == java.lang.String.class ? ${makeStringLiteral} : ${inspect}"
+                } else {
+                    return inspect
+                }
+            }
         }
 
         String makeLiteral(String s) {

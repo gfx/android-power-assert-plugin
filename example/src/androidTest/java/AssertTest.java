@@ -55,6 +55,15 @@ public class AssertTest extends AndroidTestCase {
             this.key = key;
             this.value = value;
         }
+
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
     }
 
     class HasKV {
@@ -67,13 +76,14 @@ public class AssertTest extends AndroidTestCase {
 
     public void testFieldAccess() throws Exception {
         try {
-            HasKV second = new HasKV(new KV<>("foo", "bar"));
+            HasKV second = new HasKV(new KV<>("foo\n", "bar\n"));
 
-            assert second.entry.key.equals("foo");
+            assert second.entry.key.equals("foo\n");
             assert second.entry.value.equals("zzz");
+            fail("not reached");
         } catch (AssertionError e) {
-            assert e.getMessage().contains("key=foo");
-            assert e.getMessage().contains("value=bar");
+            assert e.getMessage().contains("key=\"foo\\n\"");
+            assert e.getMessage().contains("value=\"bar\\n\"");
         }
     }
 
@@ -86,6 +96,18 @@ public class AssertTest extends AndroidTestCase {
         } catch (RuntimeException e) {
             assert e.getMessage().contains("AssertTest$KV.key");
             assert e.getMessage().contains("null");
+        }
+    }
+
+    public void testMethodCall() throws Exception {
+        try {
+            HasKV second = new HasKV(new KV<>("foo\n", "bar\n"));
+
+            assert second.entry.getKey().equals("foo\n");
+            assert second.entry.getValue().equals("zzz");
+        } catch (AssertionError e) {
+            assert e.getMessage().contains("getKey()=\"foo\\n\"");
+            assert e.getMessage().contains("getValue()=\"bar\\n\"");
         }
     }
 }
