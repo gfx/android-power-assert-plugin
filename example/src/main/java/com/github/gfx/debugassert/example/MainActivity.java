@@ -2,19 +2,34 @@ package com.github.gfx.debugassert.example;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends Activity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ButterKnife.inject(this);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
+    @OnClick(R.id.button1)
+    void onButton1Click() {
         Foo.f(false);
+    }
+
+    @OnClick(R.id.button2)
+    void onButton2Click() {
+        assert findViewById(android.R.id.list).getVisibility() == View.VISIBLE;
+    }
+
+    @OnClick(R.id.button3)
+    void onButton3Click() {
+        LayoutInflater inflater = getLayoutInflater();
+        assert inflater.getContext() == null;
     }
 }
