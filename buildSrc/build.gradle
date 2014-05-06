@@ -11,4 +11,5 @@ dependencies {
     compile 'com.android.tools.build:gradle:0.10.+'
 
     compile 'org.javassist:javassist:3.18.+'
+    compile 'org.apache.commons:commons-lang3:+'
 }
