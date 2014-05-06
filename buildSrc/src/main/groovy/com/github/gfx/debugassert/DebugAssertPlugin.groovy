@@ -31,7 +31,7 @@ public class DebugAssertPlugin implements Plugin<Project> {
     private Project project;
 
     private ClassPool classPool
-    private CtClass stringBufferClass
+    private CtClass stringBuilderClass
 
     @Override
     void apply(Project project) {
@@ -40,7 +40,7 @@ public class DebugAssertPlugin implements Plugin<Project> {
         checkAndroidPlugin()
 
         classPool = ClassPool.default
-        stringBufferClass = classPool.getCtClass("java.lang.StringBuilder")
+        stringBuilderClass = classPool.getCtClass("java.lang.StringBuilder")
 
         AppExtension android = project.android
 
@@ -152,8 +152,8 @@ dependencies {
         if (modified) {
             c.getDeclaredMethods().each { CtMethod method ->
                 // TODO: lazy initialization?
-                method.addLocalVariable(kPowerAssertMessage, stringBufferClass)
-                method.insertBefore("$kPowerAssertMessage = new StringBuffer();")
+                method.addLocalVariable(kPowerAssertMessage, stringBuilderClass)
+                method.insertBefore("$kPowerAssertMessage = new StringBuilder();")
 
                 method.instrument(new EditAssertStatement(method))
             }
@@ -225,12 +225,12 @@ dependencies {
 
                     s.append("${kPowerAssertMessage}.append(${makeLiteral("${name}=")});\n")
                     s.append("${kPowerAssertMessage}.append(${exprToDump});\n");
+                    s.append("${kPowerAssertMessage}.append(${makeLiteral('\n')});\n");
                 }
             }
 
             return s
         }
-
 
         String makeLiteral(String s) {
             return '"' + StringEscapeUtils.escapeJava(s) + '"'
@@ -252,7 +252,7 @@ dependencies {
 
             def src = String.format('''
 {
-%1$s.insert(0, %2$s);
+%1$s.append(%2$s);
 %3$s
 $_ = $proceed((Object)%1$s);
 }
