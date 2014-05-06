@@ -12,10 +12,7 @@ import javassist.ClassPool
 import javassist.CtClass
 import javassist.CtMethod
 import javassist.bytecode.*
-import javassist.expr.ExprEditor
-import javassist.expr.FieldAccess
-import javassist.expr.MethodCall
-import javassist.expr.NewExpr
+import javassist.expr.*
 import org.apache.commons.lang3.StringEscapeUtils
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -41,6 +38,8 @@ public class DebugAssertPlugin implements Plugin<Project> {
 
         classPool = ClassPool.default
         stringBuilderClass = classPool.getCtClass("java.lang.StringBuilder")
+
+        project.dependencies.androidTestCompile(DEPENDENCIES)
 
         AppExtension android = project.android
 
@@ -173,7 +172,7 @@ dependencies {
         @Override
         void edit(FieldAccess f) throws CannotCompileException {
             if (inAssertStatement) {
-                buildFieldInformation(f)
+                f.replace(buildFieldInformation(f))
             }
 
             if (f.static && f.fieldName == '$assertionsDisabled') {
@@ -190,11 +189,20 @@ dependencies {
             }
         }
 
-        void buildFieldInformation(FieldAccess expr) {
-
+        String buildFieldInformation(FieldAccess expr) {
+            return String.format(
+                '''{
+$_ = $proceed();
+%1$s.append(%2$s);
+%1$s.append($_);
+%1$s.append("\\n");
+}''',
+                kPowerAssertMessage,
+                makeLiteral("${expr.className}#${expr.fieldName}=")
+            )
         }
 
-        CharSequence buildVariableTable(int lineNumber) {
+        CharSequence buildVariableTable(Expr expr) {
             MethodInfo methodInfo = method.getMethodInfo()
 
             CodeAttribute attrs = methodInfo.getCodeAttribute()
@@ -213,19 +221,23 @@ dependencies {
 
             for (int i = 0; i < vars.tableLength(); i++) {
                 def name = vars.variableName(i)
-                if (lines.lineNumber(vars.index(i)) <= lineNumber && name != kPowerAssertMessage) {
+                def startIndex = vars.startPc(i)
+                def endIndex = startIndex + vars.codeLength(i)
+                def index = expr.indexOfBytecode()
+                if ((startIndex <= index && index < endIndex) && name != kPowerAssertMessage) {
                     CtClass varType = Descriptor.toCtClass(vars.descriptor(i), classPool)
 
-                    info "${name} ${varType.name}"
+                    info "${lines.lineNumber(vars.index(i))}: ${varType.simpleName} ${name}"
 
                     def exprToDump = name
                     if (!varType.isPrimitive()) {
-                        exprToDump = "ToStringBuilder.reflectionToString((Object)${exprToDump})"
+                        exprToDump = "ToStringBuilder.reflectionToString((Object)${exprToDump}, ToStringStyle.SHORT_PREFIX_STYLE)"
                     }
 
-                    s.append("${kPowerAssertMessage}.append(${makeLiteral("${name}=")});\n")
-                    s.append("${kPowerAssertMessage}.append(${exprToDump});\n");
-                    s.append("${kPowerAssertMessage}.append(${makeLiteral('\n')});\n");
+                    // _s is a local StringBuilder for this `new AssertionError()` expression
+                    s.append("_s.append(${makeLiteral("${name}=")});\n")
+                    s.append("_s.append(${exprToDump});\n");
+                    s.append("_s.append(${makeLiteral('\n')});\n");
                 }
             }
 
@@ -242,7 +254,7 @@ dependencies {
          * @param expr the `new AssertionError()` expression
          */
         void injectVariableInformation(NewExpr expr) {
-            CharSequence localVars = buildVariableTable(expr.lineNumber)
+            CharSequence localVars = buildVariableTable(expr)
 
             def messagePrefix = new StringBuilder()
             if (expr.constructor.parameterTypes.length > 0) {
@@ -250,13 +262,17 @@ dependencies {
             }
             messagePrefix.append('"\\n"')
 
-            def src = String.format('''
-{
-%1$s.append(%2$s);
+            def src = String.format('''{
+StringBuilder _s = new StringBuilder(%2$s);
+_s.append("LOCAL VARIABLES:\\n");
 %3$s
-$_ = $proceed((Object)%1$s);
-}
-''', kPowerAssertMessage, messagePrefix, localVars);
+_s.append("TEMPORARY VALUES:\\n");
+_s.append("\\n");
+_s.append(%1$s);
+
+%1$s.setLength(0);
+$_ = $proceed((Object)_s);
+}''', kPowerAssertMessage, messagePrefix, localVars);
             info src
             expr.replace(src);
         }

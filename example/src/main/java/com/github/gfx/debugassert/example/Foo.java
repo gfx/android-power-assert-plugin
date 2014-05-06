@@ -11,8 +11,5 @@ public class Foo {
     public static void f(boolean expr) {
         Foo foo = new Foo(expr);
         assert foo.bar.value : "expects foo.value to be true";
-
-        int bar = 42;
-        assert bar == 42;
     }
 }
