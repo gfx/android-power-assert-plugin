@@ -7,7 +7,10 @@ import com.android.build.gradle.api.ApplicationVariant
 import com.android.builder.DefaultBuildType
 import com.android.builder.model.BuildType
 import groovy.io.FileType
-import javassist.*
+import javassist.CannotCompileException
+import javassist.ClassPool
+import javassist.CtClass
+import javassist.CtMethod
 import javassist.bytecode.*
 import javassist.expr.*
 import org.apache.commons.lang3.StringEscapeUtils
@@ -60,6 +63,26 @@ public class DebugAssertPlugin implements Plugin<Project> {
                     enableDebugAssert(variant.testVariant)
                 }
             }
+        }
+    }
+
+    private void trace(message) {
+        println "[DebugAssert] $message"
+        project.logger.trace "[DebugAssert] $message"
+    }
+
+    private void info(message) {
+        println "[DebugAssert] $message"
+        project.logger.info "[DebugAssert] $message"
+    }
+
+    @SuppressWarnings("unused")
+    private void growl(String title, String message) {
+        info(message)
+        project.logger.info("[$title] $message")
+        def proc = ["osascript", "-e", "display notification \"${message}\" with title \"${title}\""].execute()
+        if (proc.waitFor() != 0) {
+            println "[WARNING] ${proc.err.text.trim()}"
         }
     }
 
@@ -152,24 +175,11 @@ dependencies {
         })
 
         if (modified) {
-            // FIXME: kPowerAssertMessage is NOT thread safe
-            c.addField(CtField.make("private static final StringBuilder ${kPowerAssertMessage} = new StringBuilder();", c))
-
             c.getDeclaredMethods().each { CtMethod method ->
-                method.insertBefore("${kPowerAssertMessage}.setLength(0);")
+                method.addLocalVariable(kPowerAssertMessage, stringBuilderClass)
+                method.insertBefore("${kPowerAssertMessage} = new StringBuilder();")
 
-                def editor = new EditAssertStatement(method)
-                method.instrument(editor)
-
-                if (editor.hasAssertStatement) {
-                    info "add try-catch for RuntimeException in ${method.name}() to catch NPE"
-                    def catchSrc = String.format('''{
-throw new RuntimeException("possible causes:\\n" + %1$s, (Throwable)$e);
-}''',
-                        kPowerAssertMessage
-                    )
-                    method.addCatch(catchSrc, runtimeExceptinClass)
-                }
+                method.instrument(new EditAssertStatement(method))
             }
         }
         return modified;
@@ -180,8 +190,6 @@ throw new RuntimeException("possible causes:\\n" + %1$s, (Throwable)$e);
 
         boolean inAssertStatement = false
 
-        public boolean hasAssertStatement = false;
-
         EditAssertStatement(CtMethod method) {
             this.method = method
         }
@@ -190,14 +198,22 @@ throw new RuntimeException("possible causes:\\n" + %1$s, (Throwable)$e);
         void edit(FieldAccess f) throws CannotCompileException {
             if (inAssertStatement) {
                 def src = buildFieldInformation(f)
-                info src
+                trace src
                 f.replace(src)
             }
 
             if (f.static && f.fieldName == '$assertionsDisabled') {
                 info "assert statement found at ${f.fileName}:${f.lineNumber}"
                 inAssertStatement = true
-                hasAssertStatement = true
+
+                f.replace(String.format('''{
+$_ = $proceed();
+if (%1$s == null) {
+    %1$s = new StringBuilder();
+} else {
+    %1$s.setLength(0);
+}
+}''', kPowerAssertMessage))
             }
         }
 
@@ -206,7 +222,7 @@ throw new RuntimeException("possible causes:\\n" + %1$s, (Throwable)$e);
             if (inAssertStatement) {
                 def src = buildMethodResultInformation(m)
                 if (src != null) {
-                    info src
+                    trace src
                     m.replace(src)
                 }
             }
@@ -223,7 +239,13 @@ throw new RuntimeException("possible causes:\\n" + %1$s, (Throwable)$e);
         String buildFieldInformation(FieldAccess expr) {
             return String.format(
                 '''{
-$_ = $proceed($$);
+try {
+  $_ = $proceed($$);
+} catch (NullPointerException e) {
+  Exception ex = new NullPointerException(%1$s.toString());
+  ex.setStackTrace(e.getStackTrace());
+  throw ex;
+}
 %1$s.append(%2$s);
 %1$s.append(%3$s);
 %1$s.append("\\n");
@@ -241,7 +263,13 @@ $_ = $proceed($$);
             }
             return String.format(
                 '''{
-$_ = $proceed($$);
+try {
+  $_ = $proceed($$);
+} catch (NullPointerException e) {
+  Exception ex = new NullPointerException(%1$s.toString());
+  ex.setStackTrace(e.getStackTrace());
+  throw ex;
+}
 %1$s.append(%2$s);
 %1$s.append(%3$s);
 %1$s.append("\\n");
@@ -337,21 +365,6 @@ $_ = $proceed((Object)_s);
 }''', kPowerAssertMessage, messagePrefix, localVars);
             info src
             expr.replace(src);
-        }
-    }
-
-    private void info(message) {
-        println "[DebugAssert] $message"
-        project.logger.info "[DebugAssert] $message"
-    }
-
-    @SuppressWarnings("unused")
-    private void growl(String title, String message) {
-        info(message)
-        project.logger.info("[$title] $message")
-        def proc = ["osascript", "-e", "display notification \"${message}\" with title \"${title}\""].execute()
-        if (proc.waitFor() != 0) {
-            println "[WARNING] ${proc.err.text.trim()}"
         }
     }
 }

@@ -82,7 +82,6 @@ public class AssertTest extends AndroidTestCase {
             assert second.entry.value.equals("zzz");
             fail("not reached");
         } catch (AssertionError e) {
-            assert e.getMessage().contains("key=\"foo\\n\"");
             assert e.getMessage().contains("value=\"bar\\n\"");
         }
     }
@@ -94,8 +93,7 @@ public class AssertTest extends AndroidTestCase {
             assert second.entry.key.equals("foo");
             fail("not reached");
         } catch (RuntimeException e) {
-            assert e.getMessage().contains("AssertTest$KV.key");
-            assert e.getMessage().contains("null");
+            assert e.getMessage().contains("AssertTest$HasKV.entry=<null>");
         }
     }
 
@@ -106,7 +104,6 @@ public class AssertTest extends AndroidTestCase {
             assert second.entry.getKey().equals("foo\n");
             assert second.entry.getValue().equals("zzz");
         } catch (AssertionError e) {
-            assert e.getMessage().contains("getKey()=\"foo\\n\"");
             assert e.getMessage().contains("getValue()=\"bar\\n\"");
         }
     }
