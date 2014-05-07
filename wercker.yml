@@ -1,0 +1,13 @@
+box: wercker/android
+build:
+  steps:
+    - script:
+        name: show base information
+        code: |
+          echo $ANDROID_HOME
+          echo $ANDROID_BUILD_TOOLS
+          echo $ANDROID_UPDATE_FILTER
+    - script:
+        name: run gradle
+        code: |
+          ./gradlew --full-stacktrace -q --project-cache-dir=$WERCKER_CACHE_DIR build
