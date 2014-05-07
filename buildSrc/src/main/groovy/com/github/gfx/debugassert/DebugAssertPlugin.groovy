@@ -331,7 +331,7 @@ StringBuilder _s = new StringBuilder(%2$s);
 _s.append("LOCAL VARIABLES:\\n");
 %3$s
 _s.append("\\nTEMPORARY VALUES:\\n");
-_s.append(%1$s);
+_s.append((Object)%1$s);
 
 $_ = $proceed((Object)_s);
 }''', kPowerAssertMessage, messagePrefix, localVars);
