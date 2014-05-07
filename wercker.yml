@@ -10,4 +10,4 @@ build:
     - script:
         name: run gradle
         code: |
-          ./gradlew --full-stacktrace -q --project-cache-dir=$WERCKER_CACHE_DIR --info build
+          ./gradlew --full-stacktrace --project-cache-dir=$WERCKER_CACHE_DIR build
