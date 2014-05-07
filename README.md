@@ -1,4 +1,4 @@
-# Android Power Assert
+# Android Power Assert [![wercker status](https://app.wercker.com/status/b5ff7f4f8ec53e3bc8bed5d6435dc511/s/ "wercker status")](https://app.wercker.com/project/bykey/b5ff7f4f8ec53e3bc8bed5d6435dc511)
 
 Power Assert, invented in Groovy and being spread around other proramming languages, is becomming a fundamental feature for debugging and testing, especially in unit tests: you no longer need to learn a bunch of test machers such as `assertEquals()`.
 
