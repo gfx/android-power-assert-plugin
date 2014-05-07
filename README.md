@@ -2,6 +2,10 @@
 
 Power Assert, invented in Groovy and being spread around other proramming languages, is becomming a fundamental feature for debugging and testing, especially in unit tests: you no longer need to learn a bunch of test machers such as `assertEquals()`.
 
+# Usage
+
+This library is not yet available as a Gradle plugin.
+
 # Author And License
 
 Copyright 2014, Fuji Goro (gfx) <gfuji@cpan.org>. All rights reserved.
