@@ -1,4 +1,4 @@
-package com.github.gfx.debugassert
+package com.github.gfx.powerassert
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
@@ -20,7 +20,10 @@ import org.gradle.api.Project
 
 // see http://www.gradle.org/docs/current/userguide/custom_plugins.html
 
-public class DebugAssertPlugin implements Plugin<Project> {
+public class PowerAssertPlugin implements Plugin<Project> {
+    private static final String TAG = 'PowerAssert'
+    private static final boolean VERBOSE = System.getenv('CI') || System.getenv('POWERASSERT_VERBOSE')
+
     private static final String kPowerAssertMessage = '$powerAssertMessage'
 
     /**
@@ -32,7 +35,7 @@ public class DebugAssertPlugin implements Plugin<Project> {
 
     private ClassPool classPool
     private CtClass stringBuilderClass
-    private CtClass runtimeExceptinClass
+    private CtClass runtimeExceptionClass
 
     @Override
     void apply(Project project) {
@@ -42,7 +45,7 @@ public class DebugAssertPlugin implements Plugin<Project> {
 
         classPool = ClassPool.default
         stringBuilderClass = classPool.getCtClass("java.lang.StringBuilder")
-        runtimeExceptinClass = classPool.getCtClass("java.lang.RuntimeException")
+        runtimeExceptionClass = classPool.getCtClass("java.lang.RuntimeException")
 
         project.dependencies.androidTestCompile(DEPENDENCIES)
 
@@ -67,13 +70,19 @@ public class DebugAssertPlugin implements Plugin<Project> {
     }
 
     private void trace(message) {
-        println "[DebugAssert] $message"
-        project.logger.trace "[DebugAssert] $message"
+        if (VERBOSE) {
+            println "[$TAG] $message"
+        } else {
+            project.logger.trace "[$TAG] $message"
+        }
     }
 
     private void info(message) {
-        println "[DebugAssert] $message"
-        project.logger.info "[DebugAssert] $message"
+        if (VERBOSE) {
+            println "[$TAG] $message"
+        } else {
+            project.logger.info "[$TAG] $message"
+        }
     }
 
     @SuppressWarnings("unused")
@@ -206,14 +215,16 @@ dependencies {
                 info "assert statement found at ${f.fileName}:${f.lineNumber}"
                 inAssertStatement = true
 
-                f.replace(String.format('''{
+                def src = String.format('''{
 $_ = $proceed();
 if (%1$s == null) {
     %1$s = new StringBuilder();
 } else {
     %1$s.setLength(0);
 }
-}''', kPowerAssertMessage))
+}''', kPowerAssertMessage)
+                trace src
+                f.replace(src)
             }
         }
 
@@ -363,7 +374,7 @@ _s.append((Object)%1$s);
 
 $_ = $proceed((Object)_s);
 }''', kPowerAssertMessage, messagePrefix, localVars);
-            info src
+            trace src
             expr.replace(src);
         }
     }

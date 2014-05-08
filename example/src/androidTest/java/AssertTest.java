@@ -1,6 +1,6 @@
 import android.test.AndroidTestCase;
 
-import com.github.gfx.debugassert.example.Foo;
+import com.github.gfx.powerassert.example.Foo;
 
 public class AssertTest extends AndroidTestCase {
     public void testAssert() throws Exception {

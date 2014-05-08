@@ -4,11 +4,24 @@ Power Assert, invented in Groovy and being spread around other proramming langua
 
 # Usage
 
-This library is not yet available as a Gradle plugin.
+**This library is not yet available in Maven Central.**
+
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.gfx:android-power-assert-plugin:0.10.+'
+    }
+}
+
+apply plugin: 'android-power-assert'
+```
 
 # Author And License
 
-Copyright 2014, Fuji Goro (gfx) <gfuji@cpan.org>. All rights reserved.
+Copyright 2014, FUJI Goro (gfx) <gfuji@cpan.org>. All rights reserved.
 
 This library may be copied only under the terms of the Apache License 2.0, which may be found in the distribution.
 

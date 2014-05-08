@@ -1,5 +1,5 @@
 apply plugin: 'android'
-apply plugin: 'android-debug-assert'
+apply plugin: 'android-power-assert'
 
 android {
     compileSdkVersion 19
@@ -31,7 +31,6 @@ android {
 
 dependencies {
     compile 'com.jakewharton:butterknife:5.0.+'
-    //compile 'org.apache.commons:commons-lang3:+'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:19.+'
