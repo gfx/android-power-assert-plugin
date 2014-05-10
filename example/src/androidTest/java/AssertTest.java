@@ -24,7 +24,6 @@ public class AssertTest extends AndroidTestCase {
     }
 
     public void testAssertEnabledInAppClasses_causedIllegalAccessError() throws Exception {
-        // java.lang.IllegalAccessError: Class ref in pre-verified class resolved to unexpected implementation
         try {
             Foo.g(false);
             fail("not reached");
