@@ -47,8 +47,6 @@ public class PowerAssertPlugin implements Plugin<Project> {
         stringBuilderClass = classPool.getCtClass("java.lang.StringBuilder")
         runtimeExceptionClass = classPool.getCtClass("java.lang.RuntimeException")
 
-        project.dependencies.androidTestCompile(DEPENDENCIES)
-
         AppExtension android = project.android
 
         android.buildTypes.all { DefaultBuildType buildType ->
@@ -60,10 +58,12 @@ public class PowerAssertPlugin implements Plugin<Project> {
         android.applicationVariants.all { ApplicationVariant variant ->
             if (isAssertionsEnabled(variant.buildType)) {
                 variant.javaCompile.doLast {
-                    enableDebugAssert(variant)
+                    enableDebugAssert(variant, variant.apkLibraries)
                 }
                 variant.testVariant.javaCompile.doLast {
-                    enableDebugAssert(variant.testVariant)
+                    List<File> libs = new ArrayList<>(variant.apkLibraries)
+                    libs.addAll(variant.testVariant.apkLibraries)
+                    enableDebugAssert(variant.testVariant, libs)
                 }
             }
         }
@@ -105,9 +105,8 @@ public class PowerAssertPlugin implements Plugin<Project> {
         }
     }
 
-    private void enableDebugAssert(ApkVariant variant) {
+    private void enableDebugAssert(ApkVariant variant, Collection<File> libraries) {
         info "setup ${variant.name}"
-        Collection<File> libraries = variant.apkLibraries
         File buildDir = variant.javaCompile.destinationDir
 
         long t0 = System.currentTimeMillis()
