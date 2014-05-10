@@ -7,10 +7,9 @@ final VERSION        = '0.10.1-snapshot'
 buildscript {
     repositories {
         mavenCentral()
-        jcenter()
     }
     dependencies {
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.+'
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.3'
     }
 }
 
