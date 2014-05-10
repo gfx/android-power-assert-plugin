@@ -112,6 +112,8 @@ public class PowerAssertPlugin implements Plugin<Project> {
         info "setup ${variant.name}"
         File buildDir = variant.javaCompile.destinationDir
 
+        TargetLinesFetcher fetcher = new TargetLinesFetcher(variant.javaCompile.source)
+
         long t0 = System.currentTimeMillis()
 
         project.plugins.findPlugin("android").bootClasspath.each { String androidJar ->
@@ -161,7 +163,7 @@ dependencies {
             path.substring(0, path.lastIndexOf(".class")).replace("/", ".")
         }.each { className ->
             CtClass c = classPool.getCtClass(className)
-            if (modifyStatements(c)) {
+            if (modifyStatements(c, fetcher)) {
                 info("Enables assertions in ${c.name}")
                 processedCount++
                 c.writeFile(absoluteBuildDir)
@@ -172,7 +174,7 @@ dependencies {
         info("Processed $processedCount/$allCount classes, elapsed ${System.currentTimeMillis() - t0}ms")
     }
 
-    private boolean modifyStatements(CtClass c) {
+    private boolean modifyStatements(CtClass c, TargetLinesFetcher fetcher) {
         boolean modified = false;
 
         c.getClassInitializer()?.instrument(new ExprEditor() {
@@ -190,7 +192,7 @@ dependencies {
                 method.addLocalVariable(kPowerAssertMessage, stringBuilderClass)
                 method.insertBefore("${kPowerAssertMessage} = null;")
 
-                method.instrument(new EditAssertStatement(method))
+                method.instrument(new EditAssertStatement(method, fetcher))
             }
         }
         return modified;
@@ -198,11 +200,13 @@ dependencies {
 
     private class EditAssertStatement extends ExprEditor {
         final CtMethod method;
+        final TargetLinesFetcher fetcher;
 
         boolean inAssertStatement = false
 
-        EditAssertStatement(CtMethod method) {
+        EditAssertStatement(CtMethod method, TargetLinesFetcher fetcher) {
             this.method = method
+            this.fetcher = fetcher
         }
 
         @Override
@@ -214,7 +218,8 @@ dependencies {
             }
 
             if (f.static && f.fieldName == '$assertionsDisabled') {
-                info "assert statement found at ${f.fileName}:${f.lineNumber}"
+                def lines = fetcher.getLines(f.enclosingClass, f.lineNumber)
+                info "assert statement found at:\n$lines"
                 inAssertStatement = true
 
                 def src = String.format('''{
@@ -224,7 +229,8 @@ if (%1$s == null) {
 } else {
     %1$s.setLength(0);
 }
-}''', kPowerAssertMessage)
+%1$s.append(%2$s);
+}''', kPowerAssertMessage, makeLiteral("\n\n" + lines + "\n\n"))
                 trace src
                 f.replace(src)
             }
@@ -369,9 +375,9 @@ try {
 
             def src = String.format('''{
 StringBuilder _s = new StringBuilder(%2$s);
-_s.append("LOCAL VARIABLES:\\n");
+_s.append("\\n\\n");
 %3$s
-_s.append("\\nTEMPORARY VALUES:\\n");
+_s.append("\\n\\n");
 _s.append((Object)%1$s);
 
 $_ = $proceed((Object)_s);

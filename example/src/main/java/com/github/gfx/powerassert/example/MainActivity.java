@@ -29,7 +29,15 @@ public class MainActivity extends Activity {
 
     @OnClick(R.id.button3)
     void onButton3Click() {
-        LayoutInflater inflater = getLayoutInflater();
-        assert inflater.getContext() == null;
+        assert new Function<LayoutInflater, Boolean>() {
+            @Override
+            public Boolean call(LayoutInflater arg) {
+                return arg.getContext() != null;
+            }
+        }.call(getLayoutInflater());
+    }
+
+    interface Function<ArgT, ResultT> {
+        ResultT call(ArgT arg);
     }
 }

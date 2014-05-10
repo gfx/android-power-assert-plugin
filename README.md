@@ -21,9 +21,23 @@ buildscript {
 apply plugin: 'android-power-assert'
 ```
 
+Then, use `assert` in your program:
+
 ```java
-// in applications
-assert x == 10; // it may throw AssertionError() with much useful information
+void onButton2Click() {
+    assert findViewById(android.R.id.list).getVisibility() == View.VISIBLE;
+}
+```
+
+This shows the following output when `findViewById()` returns null:
+
+```
+java.lang.NullPointerException:
+25:     void onButton2Click() {
+26>         assert findViewById(android.R.id.list).getVisibility() == View.VISIBLE;
+26:     }
+com.github.gfx.powerassert.example.MainActivity.findViewById()=<null>
+(...stacktrace...)
 ```
 
 # Author And License

@@ -26,7 +26,7 @@ dependencies {
     compile localGroovy()
     compile 'com.android.tools.build:gradle:+'
 
-    compile 'org.javassist:javassist:3.18.+'
+    compile 'org.javassist:javassist:3.+'
     compile 'org.apache.commons:commons-lang3:+'
 }
 
