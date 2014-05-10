@@ -22,7 +22,8 @@ import org.gradle.api.Project
 
 public class PowerAssertPlugin implements Plugin<Project> {
     private static final String TAG = 'PowerAssert'
-    private static final boolean VERBOSE = System.getenv('CI') || System.getenv('POWERASSERT_VERBOSE')
+    private static final boolean VERBOSE =
+        System.getenv('CI') || System.getenv('POWERASSERT_VERBOSE')
 
     private static final String kPowerAssertMessage = '$powerAssertMessage'
 
@@ -48,6 +49,8 @@ public class PowerAssertPlugin implements Plugin<Project> {
         runtimeExceptionClass = classPool.getCtClass("java.lang.RuntimeException")
 
         AppExtension android = project.android
+
+        android.lintOptions.disable "Assert" // assertions are now reliable
 
         android.buildTypes.all { DefaultBuildType buildType ->
             if (isAssertionsEnabled(buildType)) {
@@ -95,7 +98,7 @@ public class PowerAssertPlugin implements Plugin<Project> {
         }
     }
 
-    private boolean isAssertionsEnabled(BuildType variant) {
+    private static boolean isAssertionsEnabled(BuildType variant) {
         return variant.name != "release"
     }
 
@@ -115,7 +118,7 @@ public class PowerAssertPlugin implements Plugin<Project> {
             classPool.appendClassPath(androidJar)
         }
 
-        def hasCommonsLang3 = false
+        boolean hasCommonsLang3 = false
         libraries.each { File jar ->
             info "appendClassPath: ${jar.absolutePath}"
             classPool.appendClassPath(jar.absolutePath)
@@ -185,7 +188,7 @@ dependencies {
         if (modified) {
             c.getDeclaredMethods().each { CtMethod method ->
                 method.addLocalVariable(kPowerAssertMessage, stringBuilderClass)
-                method.insertBefore("${kPowerAssertMessage} = new StringBuilder();")
+                method.insertBefore("${kPowerAssertMessage} = null;")
 
                 method.instrument(new EditAssertStatement(method))
             }

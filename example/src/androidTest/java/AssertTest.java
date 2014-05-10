@@ -19,7 +19,17 @@ public class AssertTest extends AndroidTestCase {
             Foo.f(false);
             fail("not reached");
         } catch (AssertionError e) {
-            assertNotNull(e.getMessage().contains("false"));
+            assertTrue(e.getMessage().contains("false"));
+        }
+    }
+
+    public void testAssertEnabledInAppClasses_causedIllegalAccessError() throws Exception {
+        // java.lang.IllegalAccessError: Class ref in pre-verified class resolved to unexpected implementation
+        try {
+            Foo.g(false);
+            fail("not reached");
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("false"));
         }
     }
 
