@@ -116,4 +116,12 @@ public class AssertTest extends AndroidTestCase {
             assert e.getMessage().contains("getValue()=\"bar\\n\"");
         }
     }
+
+    public void testTargetSource() throws Exception {
+        try {
+            assert false : "Hello, world!";
+        } catch (AssertionError e) {
+            assert e.getMessage().contains("assert false : \"Hello, world!\";");
+        }
+    }
 }
