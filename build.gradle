@@ -12,3 +12,6 @@ allprojects {
         mavenCentral()
     }
 }
+
+task('uploadArchives') {
+}

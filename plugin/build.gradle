@@ -9,7 +9,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.3'
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.+'
     }
 }
 
@@ -32,6 +32,27 @@ dependencies {
 
 // artifact settings
 
+String git(String command) {
+    println "git $command"
+    def process = ["sh",  "-c",  "cd ${project.rootDir} ; git $command"].execute()
+    if (process.waitFor() != 0) {
+        throw new GradleException(process.err.text)
+    }
+    return process.in.text
+
+}
+
+task('releng') {
+    doLast {
+        def gitStatus = git("status --porcelain")
+        if (gitStatus.trim()) {
+            throw new GradleException("Changes found:\n$gitStatus")
+        }
+
+        println git("tag v$VERSION")
+        println git("push origin v$VERSION")
+    }
+}
 
 configurations {
     mavenDeployer
@@ -48,13 +69,8 @@ uploadArchives {
         pom.groupId = GROUP_ID
         pom.artifactId = ARTIFACT_ID
         pom.version = VERSION
-
-        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-            authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
-        }
     }
 }
-
 
 modifyPom {
   project {
