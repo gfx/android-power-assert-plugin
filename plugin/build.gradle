@@ -2,7 +2,7 @@ final REPOSITORY_URL = 'https://github.com/gfx/android-power-assert-plugin'
 
 final GROUP_ID       = 'com.github.gfx'
 final ARTIFACT_ID    = 'android-power-assert-plugin'
-final VERSION        = '0.10.0'
+final VERSION        = '0.10.1-snapshot'
 
 buildscript {
     repositories {
@@ -15,6 +15,8 @@ buildscript {
 }
 
 apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'nexus'
 
 repositories {
     mavenCentral()
@@ -31,14 +33,26 @@ dependencies {
 
 // artifact settings
 
-apply plugin: 'maven'
-apply plugin: 'nexus'
+
+configurations {
+    mavenDeployer
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
 
 uploadArchives {
     repositories.mavenDeployer {
         pom.groupId = GROUP_ID
         pom.artifactId = ARTIFACT_ID
         pom.version = VERSION
+
+        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+            authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+        }
     }
 }
 
@@ -66,7 +80,7 @@ modifyPom {
       developer {
         id 'gfx'
         name 'FUJI Goro'
-        email 'gfuji@cpan.org'
+        email 'g.psy.va@gmail.com'
       }
     }
   }
