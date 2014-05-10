@@ -6,9 +6,8 @@ This plugin is a Gradle build script to provie power asserts to Android to edit 
 
 # Usage
 
-**This library is not yet available in Maven Central.**
-
 ```groovy
+// in the root build.gradle
 buildscript {
     repositories {
         mavenCentral()
@@ -18,7 +17,13 @@ buildscript {
     }
 }
 
+// in a build.grdle of a module
 apply plugin: 'android-power-assert'
+```
+
+```java
+// in applications
+assert x == 10; // it may throw AssertionError() with much useful information
 ```
 
 # Author And License
