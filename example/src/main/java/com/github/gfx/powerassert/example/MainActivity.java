@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
         assert new Function<LayoutInflater, Boolean>() {
             @Override
             public Boolean call(LayoutInflater arg) {
-                return arg.getContext() != null;
+                return arg.getContext() == null;
             }
         }.call(getLayoutInflater());
     }
