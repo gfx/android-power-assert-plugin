@@ -1,8 +1,8 @@
 # Android Power Assert [![wercker status](https://app.wercker.com/status/b5ff7f4f8ec53e3bc8bed5d6435dc511/s/ "wercker status")](https://app.wercker.com/project/bykey/b5ff7f4f8ec53e3bc8bed5d6435dc511)
 
-Power Asserts, invented in Groovy and being spread around other proramming languages, are becomming a fundamental feature for debugging and testing, especially in unit tests: you no longer need to learn a bunch of test machers such as `assertEquals()`.
+Power Asserts, invented in Groovy and being spread around other programming languages, are becoming a fundamental feature for debugging and testing, especially in unit tests: you no longer need to learn a bunch of test matchers such as `assertEquals()`.
 
-This plugin is a Gradle build script to provie power asserts to Android to edit Java class files in compilation phases. No application code changes are required. All you have to do is to depend on `android-power-assert-plugin` and apply `android-power-assert` plugin in `build.gradle`, which automatically enables `assert` statements unless you makes `release` build.
+This plugin is a Gradle build script to provide power asserts to Android to edit Java class files in compilation phases. No application code changes are required. All you have to do is to depend on `android-power-assert-plugin` and apply `android-power-assert` plugin in `build.gradle`, which automatically enables `assert` statements unless you makes `release` build.
 
 # Usage
 
@@ -17,7 +17,7 @@ buildscript {
     }
 }
 
-// in a build.grdle of a module
+// in a build.gradle of a module
 apply plugin: 'android-power-assert'
 ```
 
