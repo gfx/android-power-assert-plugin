@@ -1,9 +1,9 @@
 package com.github.gfx.powerassert
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.api.ApkVariant
+import com.android.build.gradle.*
 import com.android.build.gradle.api.ApplicationVariant
+import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.api.LibraryVariant
 import com.android.builder.DefaultBuildType
 import com.android.builder.model.BuildType
 import groovy.io.FileType
@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringEscapeUtils
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.PluginContainer
 
 // see http://www.gradle.org/docs/current/userguide/custom_plugins.html
 
@@ -48,7 +49,7 @@ public class PowerAssertPlugin implements Plugin<Project> {
         stringBuilderClass = classPool.getCtClass("java.lang.StringBuilder")
         runtimeExceptionClass = classPool.getCtClass("java.lang.RuntimeException")
 
-        AppExtension android = project.android
+        BaseExtension android = project.android
 
         android.lintOptions.disable "Assert" // assertions are now reliable
 
@@ -58,17 +59,32 @@ public class PowerAssertPlugin implements Plugin<Project> {
             }
         }
 
-        android.applicationVariants.all { ApplicationVariant variant ->
-            if (isAssertionsEnabled(variant.buildType)) {
-                variant.javaCompile.doLast {
-                    enableDebugAssert(variant, variant.apkLibraries)
-                }
-                variant.testVariant.javaCompile.doLast {
-                    List<File> libs = new ArrayList<>(variant.apkLibraries)
-                    libs.addAll(variant.testVariant.apkLibraries)
-                    enableDebugAssert(variant.testVariant, libs)
+        if (android instanceof AppExtension) {
+            android.applicationVariants.all { ApplicationVariant variant ->
+                if (isAssertionsEnabled(variant.buildType)) {
+                    variant.javaCompile.doLast {
+                        enableDebugAssert(variant, variant.apkLibraries)
+                    }
+                    variant.testVariant.javaCompile.doLast {
+                        List<File> libs = new ArrayList<>(variant.apkLibraries)
+                        libs.addAll(variant.testVariant.apkLibraries)
+                        enableDebugAssert(variant.testVariant, libs)
+                    }
                 }
             }
+        } else if (android instanceof LibraryExtension) {
+            android.libraryVariants.all { LibraryVariant variant ->
+                if (isAssertionsEnabled(variant.buildType)) {
+                    variant.javaCompile.doLast {
+                        enableDebugAssert(variant, variant.testVariant.apkLibraries)
+                    }
+                    variant.testVariant.javaCompile.doLast {
+                        enableDebugAssert(variant.testVariant, variant.testVariant.apkLibraries)
+                    }
+                }
+            }
+        } else {
+            throw new GradleException("Unknown extension: ${android}");
         }
     }
 
@@ -103,12 +119,12 @@ public class PowerAssertPlugin implements Plugin<Project> {
     }
 
     private void checkAndroidPlugin() {
-        if (!project.plugins.hasPlugin(AppPlugin)) {
+        if (!(project.plugins.hasPlugin(AppPlugin) || project.plugins.hasPlugin(LibraryPlugin))) {
             throw new GradleException('No android plugin detected')
         }
     }
 
-    private void enableDebugAssert(ApkVariant variant, Collection<File> libraries) {
+    private void enableDebugAssert(BaseVariant variant, Collection<File> libraries) {
         info "setup ${variant.name}"
         File buildDir = variant.javaCompile.destinationDir
 
@@ -116,7 +132,9 @@ public class PowerAssertPlugin implements Plugin<Project> {
 
         long t0 = System.currentTimeMillis()
 
-        project.plugins.findPlugin("android").bootClasspath.each { String androidJar ->
+        PluginContainer plugins = project.plugins
+        BasePlugin androidPlugin = plugins.findPlugin(AppPlugin) ?: plugins.findPlugin(LibraryPlugin)
+        androidPlugin.bootClasspath.each { String androidJar ->
             classPool.appendClassPath(androidJar)
         }
 
@@ -348,8 +366,7 @@ try {
                 if (type.isArray() && type.getComponentType().isPrimitive()) {
                     // FIXME: Javassist can't cast a primitive array to Object
                     return "ToStringBuilder.reflectionToString((Object)ArrayUtils.toObject(${expr}), ToStringStyle.SHORT_PREFIX_STYLE)"
-                }
-                else if (type.name == "java.lang.String") {
+                } else if (type.name == "java.lang.String") {
                     return makeStringLiteral
                 } else if (type.name == "java.lang.Object") {
                     return "${expr}.getClass() == java.lang.String.class ? ${makeStringLiteral} : ${inspect}"
