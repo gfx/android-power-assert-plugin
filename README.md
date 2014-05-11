@@ -1,10 +1,12 @@
 # Android Power Assert [![wercker status](https://app.wercker.com/status/b5ff7f4f8ec53e3bc8bed5d6435dc511/s/ "wercker status")](https://app.wercker.com/project/bykey/b5ff7f4f8ec53e3bc8bed5d6435dc511)
 
-Power Asserts, invented in Groovy and being spread around other programming languages, are becoming a fundamental feature for debugging and testing, especially in unit tests: you no longer need to learn a bunch of test matchers such as `assertEquals()`.
+Power Assert is a language extension which adds extra information when assertions fail. This feature has been invented in Groovy and being spread around other programming languages, and is becoming a fundamental feature for debugging and testing, especially in unit tests: you no longer need to learn a bunch of test matchers such as `assertEquals()`.
 
-This plugin is a Gradle build script to provide power asserts to Android to edit Java class files in compilation phases. No application code changes are required. All you have to do is to depend on `android-power-assert-plugin` and apply `android-power-assert` plugin in `build.gradle`, which automatically enables `assert` statements unless you makes `release` build.
+This library, `android-power-assert`, is a Gradle plugin to provide power asserts to Android by editing Java class files in compilation phases. To use power assert, all you have to do is to depend on `android-power-assert-plugin` and apply `android-power-assert` plugin in `build.gradle`, which automatically enables `assert` statements unless you makes `release` build.
 
 # Usage
+
+This plugin uses `assert` statements in Java by applying this plugin in `build.gradle`.
 
 ```groovy
 // in the root build.gradle
@@ -13,17 +15,22 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+        classpath 'com.android.tools.build:gradle:0.10.+'
         classpath 'com.github.gfx:android-power-assert-plugin:0.10.+'
     }
 }
+```
 
+```groovy
 // in a build.gradle of a module
+apply plugin: 'android'
 apply plugin: 'android-power-assert'
 ```
 
 Then, use `assert` in your program:
 
 ```java
+// in example's MainActivity.java
 void onButton2Click() {
     assert findViewById(android.R.id.list).getVisibility() == View.VISIBLE;
 }
