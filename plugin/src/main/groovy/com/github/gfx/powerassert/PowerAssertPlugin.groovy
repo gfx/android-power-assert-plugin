@@ -181,7 +181,7 @@ dependencies {
             @Override
             void edit(MethodCall m) throws CannotCompileException {
                 if (m.className == "java.lang.Class" && m.methodName == "desiredAssertionStatus") {
-                    m.replace('{ $_ = ($r)true; }')
+                    m.replace('{ $_ = ($r)true; }') // equivalent to `setprop debug.asset true`
                     modified = true
                 }
             }
@@ -345,7 +345,11 @@ try {
                 def makeStringLiteral = String.format('("\\"" + StringEscapeUtils.escapeJava((String)%s) + "\\"")', expr)
                 def inspect = String.format('ToStringBuilder.reflectionToString((Object)%s, ToStringStyle.SHORT_PREFIX_STYLE)', expr)
 
-                if (type.name == "java.lang.String") {
+                if (type.isArray() && type.getComponentType().isPrimitive()) {
+                    // FIXME: Javassist can't cast a primitive array to Object
+                    return "ToStringBuilder.reflectionToString((Object)ArrayUtils.toObject(${expr}), ToStringStyle.SHORT_PREFIX_STYLE)"
+                }
+                else if (type.name == "java.lang.String") {
                     return makeStringLiteral
                 } else if (type.name == "java.lang.Object") {
                     return "${expr}.getClass() == java.lang.String.class ? ${makeStringLiteral} : ${inspect}"

@@ -112,6 +112,7 @@ public class AssertTest extends AndroidTestCase {
 
             assert second.entry.getKey().equals("foo\n");
             assert second.entry.getValue().equals("zzz");
+            fail("not reached");
         } catch (AssertionError e) {
             assert e.getMessage().contains("getValue()=\"bar\\n\"");
         }
@@ -120,8 +121,33 @@ public class AssertTest extends AndroidTestCase {
     public void testTargetSource() throws Exception {
         try {
             assert false : "Hello, world!";
+            fail("not reached");
         } catch (AssertionError e) {
             assert e.getMessage().contains("assert false : \"Hello, world!\";");
+        }
+    }
+
+    public void testIntArrayVariables() throws Exception {
+        try {
+            int[] array = { 10, 20, 30 };
+            assert array.length == 0;
+            fail("not reached");
+        } catch (AssertionError e) {
+            assert e.getMessage().contains("10");
+            assert e.getMessage().contains("20");
+            assert e.getMessage().contains("30");
+        }
+    }
+
+    public void testStringArrayVariables() throws Exception {
+        try {
+            String[] array = { "10", "20", "30" };
+            assert array.length == 0;
+            fail("not reached");
+        } catch (AssertionError e) {
+            assert e.getMessage().contains("10");
+            assert e.getMessage().contains("20");
+            assert e.getMessage().contains("30");
         }
     }
 }
