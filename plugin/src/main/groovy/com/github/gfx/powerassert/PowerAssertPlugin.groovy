@@ -236,9 +236,8 @@ dependencies {
             }
 
             if (f.static && f.fieldName == '$assertionsDisabled') {
-                info "assert statement found at ${f.fileName}:"
                 def lines = fetcher.getLines(f.enclosingClass, f.fileName, f.lineNumber)
-                info lines
+                info "assert statement found at ${f.fileName}:\n${lines}"
                 inAssertStatement = true
 
                 def src = String.format('''{
@@ -343,12 +342,10 @@ try {
                 if ((startIndex <= index && index < endIndex) && name != kPowerAssertMessage) {
                     CtClass varType = Descriptor.toCtClass(vars.descriptor(i), classPool)
 
-                    info "${lines.lineNumber(vars.index(i))}: ${varType.simpleName} ${name}"
-
                     def exprToDump = inspectExpr(name, varType)
 
                     // _s is a local StringBuilder for this `new AssertionError()` expression
-                    s.append("_s.append(${makeLiteral("${name}=")});\n")
+                    s.append("_s.append(${makeLiteral("${name}=")}); /* local variable */\n")
                     s.append("_s.append(${exprToDump});\n");
                     s.append("_s.append(${makeLiteral('\n')});\n");
                 }
