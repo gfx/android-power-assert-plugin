@@ -2,6 +2,8 @@ package com.github.gfx.powerassert.example;
 
 import android.test.AndroidTestCase;
 
+import com.github.gfx.powerassert.example.p.Baz;
+
 public class AssertTest extends AndroidTestCase {
     public void testAssert() throws Exception {
         try {
@@ -129,7 +131,7 @@ public class AssertTest extends AndroidTestCase {
 
     public void testIntArrayVariables() throws Exception {
         try {
-            int[] array = { 10, 20, 30 };
+            int[] array = {10, 20, 30};
             assert array.length == 0;
             fail("not reached");
         } catch (AssertionError e) {
@@ -141,13 +143,39 @@ public class AssertTest extends AndroidTestCase {
 
     public void testStringArrayVariables() throws Exception {
         try {
-            String[] array = { "10", "20", "30" };
+            String[] array = {"10", "20", "30"};
             assert array.length == 0;
             fail("not reached");
         } catch (AssertionError e) {
             assert e.getMessage().contains("10");
             assert e.getMessage().contains("20");
             assert e.getMessage().contains("30");
+        }
+    }
+
+    public void testAssertInAnotherPackage() throws Exception {
+        try {
+            Baz.f(false);
+            fail("not reached");
+        } catch (AssertionError e) {
+            assert e.getMessage().contains("expr");
+        }
+    }
+
+    public void testWithAnonClass() throws Exception {
+        final int value = 42;
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                assert value == 0;
+            }
+        };
+
+        try {
+            runnable.run();
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("value"));
         }
     }
 }

@@ -236,8 +236,9 @@ dependencies {
             }
 
             if (f.static && f.fieldName == '$assertionsDisabled') {
-                def lines = fetcher.getLines(f.enclosingClass, f.lineNumber)
-                info "assert statement found at:\n$lines"
+                info "assert statement found at ${f.fileName}:"
+                def lines = fetcher.getLines(f.enclosingClass, f.fileName, f.lineNumber)
+                info lines
                 inAssertStatement = true
 
                 def src = String.format('''{

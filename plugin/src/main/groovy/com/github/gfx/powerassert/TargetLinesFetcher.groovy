@@ -12,12 +12,14 @@ public class TargetLinesFetcher {
         this.sourceTree = sourceTree
     }
 
-    public String getLines(CtClass c, int targetLineNumber) {
+    public String getLines(CtClass c, String baseName, int targetLineNumber) {
         int target = targetLineNumber - 1 // line number is 1-origin
 
         String[] lines = cache.get(c)
         if (lines == null) {
-            String sourceFile = c.name.replace(".", "/") + ".java"
+            String sourceFile = c.name.replace(".", "/")
+            sourceFile = sourceFile.substring(0, sourceFile.lastIndexOf("/") + 1) // remote class name
+            sourceFile += baseName
 
             def matched = sourceTree.filter { File f ->
                 f.absolutePath.endsWith(sourceFile)
