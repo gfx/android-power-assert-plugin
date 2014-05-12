@@ -23,6 +23,12 @@ public class PowerAssertPlugin implements Plugin<Project> {
 
         android.lintOptions.disable "Assert" // assertions are now reliable
 
+        android.packagingOptions {
+            // exclude possibbly-conflicting files in commons-lang3
+            exclude 'META-INF/NOTICE.txt'
+            exclude 'META-INF/LICENSE.txt'
+        }
+
         android.buildTypes.all { DefaultBuildType buildType ->
             if (isAssertionsEnabled(buildType)) {
                 project.dependencies."${buildType.name}Compile"(Empower.DEPENDENCIES)
