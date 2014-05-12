@@ -3,7 +3,6 @@ package com.github.gfx.powerassert.example;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -24,7 +23,7 @@ public class MainActivity extends Activity {
 
     @OnClick(R.id.button2)
     void onButton2Click() {
-        assert findViewById(android.R.id.list).getVisibility() == View.VISIBLE;
+        assert findViewById(R.id.never).isFocused();
     }
 
     @OnClick(R.id.button3)
