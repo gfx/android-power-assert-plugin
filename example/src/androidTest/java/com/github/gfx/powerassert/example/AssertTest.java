@@ -7,7 +7,7 @@ import com.github.gfx.powerassert.example.p.Baz;
 public class AssertTest extends AndroidTestCase {
     public void testAssert() throws Exception {
         try {
-            int num = 42;
+            int num = 42 + hashCode();
             assert num == 20;
             fail("not reached");
         } catch (AssertionError e) {

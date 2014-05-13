@@ -72,17 +72,17 @@ class Empower {
         project.logger.info("[$title] $message")
         def process = ["osascript", "-e", "display notification \"${message}\" with title \"${title}\""].execute()
         if (process.waitFor() != 0) {
-            println "[WARNING] ${proc.err.text.trim()}"
+            println "[WARNING] ${process.err.text.trim()}"
         }
     }
 
     void execute() {
+        long t0 = System.currentTimeMillis()
+
         info "processing ${variant.name}"
         File buildDir = variant.javaCompile.destinationDir
 
         TargetLinesFetcher fetcher = new TargetLinesFetcher(variant.javaCompile.source)
-
-        long t0 = System.currentTimeMillis()
 
         PluginContainer plugins = project.plugins
         BasePlugin androidPlugin = plugins.findPlugin(AppPlugin) ?: plugins.findPlugin(LibraryPlugin)
@@ -357,5 +357,4 @@ $_ = $proceed((Object)_s);
             expr.replace(src);
         }
     }
-
 }
