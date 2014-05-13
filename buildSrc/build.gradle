@@ -2,6 +2,6 @@ repositories {
     mavenCentral()
 }
 
-rootProject.dependencies {
+dependencies {
     compile project(':plugin')
 }
