@@ -1,8 +1,8 @@
 final REPOSITORY_URL = 'https://github.com/gfx/android-power-assert-plugin'
 
-final GROUP_ID       = 'com.github.gfx'
-final ARTIFACT_ID    = 'android-power-assert-plugin'
-final VERSION        = '0.10.3'
+final GROUP_ID = 'com.github.gfx'
+final ARTIFACT_ID = 'android-power-assert-plugin'
+final VERSION = '0.10.3'
 
 buildscript {
     repositories {
@@ -34,7 +34,7 @@ dependencies {
 
 String git(String command) {
     println "git $command"
-    def process = ["sh",  "-c",  "cd ${project.rootDir} ; git $command"].execute()
+    def process = ["sh", "-c", "cd ${project.rootDir} ; git $command"].execute()
     if (process.waitFor() != 0) {
         throw new GradleException(process.err.text)
     }
@@ -73,30 +73,30 @@ uploadArchives {
 }
 
 modifyPom {
-  project {
-    name 'Android Power Assert Plugin'
-    description 'Gradle plugin for Android which enables assertions and makes them much nicer.'
-    url REPOSITORY_URL
-    inceptionYear '2014'
+    project {
+        name 'Android Power Assert Plugin'
+        description 'Gradle plugin for Android which enables assertions and makes them much nicer.'
+        url REPOSITORY_URL
+        inceptionYear '2014'
 
-    scm {
-      url REPOSITORY_URL
-    }
+        scm {
+            url REPOSITORY_URL
+        }
 
-    licenses {
-      license {
-        name 'The Apache Software License, Version 2.0'
-        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-        distribution 'repo'
-      }
-    }
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
 
-    developers {
-      developer {
-        id 'gfx'
-        name 'FUJI Goro'
-        email 'g.psy.va@gmail.com'
-      }
+        developers {
+            developer {
+                id 'gfx'
+                name 'FUJI Goro'
+                email 'g.psy.va@gmail.com'
+            }
+        }
     }
-  }
 }
