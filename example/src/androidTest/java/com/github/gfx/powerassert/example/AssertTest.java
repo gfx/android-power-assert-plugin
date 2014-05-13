@@ -163,7 +163,7 @@ public class AssertTest extends AndroidTestCase {
     }
 
     public void testWithAnonClass() throws Exception {
-        final int value = 42;
+        final int value = 42 + this.hashCode();
 
         Runnable runnable = new Runnable() {
             @Override
