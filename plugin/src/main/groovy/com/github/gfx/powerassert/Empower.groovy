@@ -36,6 +36,7 @@ class Empower {
     private final CtClass runtimeExceptionClass
 
     Empower(Project project, BaseVariant variant, Collection<File> libraries) {
+        final long t0 = System.currentTimeMillis()
         this.project = project
         this.variant = variant;
         this.libraries = libraries;
@@ -132,11 +133,12 @@ dependencies {
             def path = classFile.absolutePath.substring(absoluteBuildDir.length() + 1 /* for a path separator */)
             path.substring(0, path.lastIndexOf(".class")).replace("/", ".")
         }.each { className ->
+            final long t1 = System.currentTimeMillis()
             CtClass c = classPool.getCtClass(className)
             if (modifyStatements(c, fetcher)) {
-                info("Enables assertions in ${c.name}")
                 processedCount++
                 c.writeFile(absoluteBuildDir)
+                info("Enables assertions in ${c.name} (elapsed ${System.currentTimeMillis() - t1}ms)")
             }
             allCount++
         }
