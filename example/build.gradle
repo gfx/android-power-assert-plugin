@@ -2,6 +2,8 @@ apply plugin: 'android-sdk-manager'
 apply plugin: 'android'
 apply plugin: 'android-power-assert'
 
+//com.github.gfx.powerassert.PowerAssertPlugin.setEmpower(false)
+
 android {
     compileSdkVersion 19
     buildToolsVersion "19.0.3"

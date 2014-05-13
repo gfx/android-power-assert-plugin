@@ -15,6 +15,18 @@ public class PowerAssertPlugin implements Plugin<Project> {
     static final String TAG = 'PowerAssert'
     static final boolean VERBOSE = System.getenv('CI') || System.getenv('POWERASSERT_VERBOSE')
 
+    static boolean empower = true
+
+    /**
+     * If you call <code>setEmpower(false)</code>, this plugin enable assertions but
+     * does not add extra information around assertions.
+     * Use this if you have problems in android-power-assert-plugin.
+     * @param enabled
+     */
+    public static void setEmpower(boolean enabled) {
+        empower = enabled
+    }
+
     @Override
     void apply(Project project) {
         checkAndroidPlugin(project)

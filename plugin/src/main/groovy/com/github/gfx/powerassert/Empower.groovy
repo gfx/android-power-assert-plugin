@@ -157,7 +157,7 @@ dependencies {
             }
         })
 
-        if (modified) {
+        if (modified && PowerAssertPlugin.empower) {
             c.getDeclaredMethods().each { CtMethod method ->
                 method.addLocalVariable(kPowerAssertMessage, stringBuilderClass)
                 method.insertBefore("${kPowerAssertMessage} = null;")
