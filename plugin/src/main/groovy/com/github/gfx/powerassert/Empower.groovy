@@ -81,33 +81,12 @@ class Empower {
         long t0 = System.currentTimeMillis()
 
         info "processing ${variant.name}"
+
+        setupClasspath()
+
         File buildDir = variant.javaCompile.destinationDir
 
         TargetLinesFetcher fetcher = new TargetLinesFetcher(variant.javaCompile.source)
-
-        PluginContainer plugins = project.plugins
-        BasePlugin androidPlugin = plugins.findPlugin(AppPlugin) ?: plugins.findPlugin(LibraryPlugin)
-        androidPlugin.bootClasspath.each { String androidJar ->
-            classPool.appendClassPath(androidJar)
-        }
-
-        boolean hasCommonsLang3 = false
-        libraries.each { File jar ->
-            info "appendClassPath: ${jar.absolutePath}"
-            classPool.appendClassPath(jar.absolutePath)
-
-            if (jar.name.startsWith("commons-lang3")) {
-                hasCommonsLang3 = true
-            }
-        }
-        if (!hasCommonsLang3) {
-            String depsDecl = """
-dependencies {
-    ${variant.name}Compile ${this.class.simpleName}.DEPENDENCIES
-}
-"""
-            throw new GradleException("commons-lang3 is required. Specify in dependencies: $depsDecl")
-        }
 
         classPool.importPackage("org.apache.commons.lang3.builder")
         classPool.importPackage("org.apache.commons.lang3")
@@ -144,6 +123,32 @@ dependencies {
         }
 
         info("Processed $processedCount/$allCount classes, elapsed ${System.currentTimeMillis() - t0}ms")
+    }
+
+    private void setupClasspath() {
+        PluginContainer plugins = project.plugins
+        BasePlugin androidPlugin = plugins.findPlugin(AppPlugin) ?: plugins.findPlugin(LibraryPlugin)
+        androidPlugin.bootClasspath.each { String androidJar ->
+            classPool.appendClassPath(androidJar)
+        }
+
+        boolean hasCommonsLang3 = false
+        libraries.each { File jar ->
+            info "appendClassPath: ${jar.absolutePath}"
+            classPool.appendClassPath(jar.absolutePath)
+
+            if (jar.name.startsWith("commons-lang3")) {
+                hasCommonsLang3 = true
+            }
+        }
+        if (!hasCommonsLang3) {
+            String depsDecl = """
+dependencies {
+    ${variant.name}Compile ${this.class.simpleName}.DEPENDENCIES
+}
+"""
+            throw new GradleException("[BUG] Missing libraries. You can specify them in dependencies: $depsDecl")
+        }
     }
 
     private boolean modifyStatements(CtClass c, TargetLinesFetcher fetcher) {
