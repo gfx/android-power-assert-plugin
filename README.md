@@ -1,4 +1,4 @@
-# Android Power Assert [![wercker status](https://app.wercker.com/status/b5ff7f4f8ec53e3bc8bed5d6435dc511/s/ "wercker status")](https://app.wercker.com/project/bykey/b5ff7f4f8ec53e3bc8bed5d6435dc511)
+# Android Power Assert [![Build Status](https://travis-ci.org/gfx/android-power-assert-plugin.svg?branch=master)](https://travis-ci.org/gfx/android-power-assert-plugin)
 
 Power Assert is a language extension which adds extra information when assertions fail. This feature has been invented in Groovy and being spread around other programming languages, and is becoming a fundamental feature for debugging and testing, especially in unit tests: you no longer need to learn a bunch of test matchers such as [assertEquals()](http://developer.android.com/reference/junit/framework/Assert.html).
 
