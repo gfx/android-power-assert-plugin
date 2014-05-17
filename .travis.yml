@@ -6,7 +6,7 @@ before_install:
     - android list targets # for debugging
     - echo no | android create avd --force -n test -t $ANDROID_TARGET -b armeabi-v7a
     - emulator -avd test -no-skin -no-audio -no-window &
-    - curl -L https://raw.githubusercontent.com/embarkmobile/android-sdk-installer/master/wait_for_emulator | sh
+    - curl -LO https://raw.githubusercontent.com/embarkmobile/android-sdk-installer/master/wait_for_emulator | bash
 script:
     - ./gradlew lint
     - ./gradlew connectedAndroidTest
