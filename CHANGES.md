@@ -1,5 +1,12 @@
 # The revision history of android-power-assert-plugin
 
+
+## v0.10.4 - 2014-05-18 20:11:17+0900
+
+* No feature changes
+* Revise logging; POWERASSERT_VERBOSE=1 is recommended in CI
+  in order to show how this plugin spend time
+
 ## v0.10.3 - 2014-05-13 09:11:19+0900
 
 * Fix a lot of compilation problems
