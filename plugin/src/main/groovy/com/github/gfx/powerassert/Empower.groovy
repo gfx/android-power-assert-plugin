@@ -36,7 +36,6 @@ class Empower {
     private final CtClass runtimeExceptionClass
 
     Empower(Project project, BaseVariant variant, Collection<File> libraries) {
-        final long t0 = System.currentTimeMillis()
         this.project = project
         this.variant = variant;
         this.libraries = libraries;
@@ -179,6 +178,8 @@ dependencies {
         final CtMethod method;
         final TargetLinesFetcher fetcher;
 
+        boolean initialized = false;
+
         boolean inAssertStatement = false
 
         EditAssertStatement(CtMethod method, TargetLinesFetcher fetcher) {
@@ -189,27 +190,16 @@ dependencies {
         @Override
         void edit(FieldAccess f) throws CannotCompileException {
             if (inAssertStatement) {
-                def src = buildFieldInformation(f)
+                def src = buildPowerAssertMessageInitialization(f)
+                src += buildFieldInformation(f)
                 trace src
                 f.replace(src)
             }
 
             if (f.static && f.fieldName == '$assertionsDisabled') {
-                def lines = fetcher.getLines(f.enclosingClass, f.fileName, f.lineNumber)
-                info "assert statement found at ${f.fileName}:\n${lines}"
+                info "assert statement found at ${f.fileName}:${f.lineNumber}"
                 inAssertStatement = true
-
-                def src = String.format('''{
-$_ = $proceed();
-if (%1$s == null) {
-    %1$s = new StringBuilder();
-} else {
-    %1$s.setLength(0);
-}
-%1$s.append(%2$s);
-}''', kPowerAssertMessage, makeLiteral("\n\n" + lines + "\n\n"))
-                trace src
-                f.replace(src)
+                initialized = false
             }
         }
 
@@ -218,6 +208,7 @@ if (%1$s == null) {
             if (inAssertStatement) {
                 def src = buildMethodResultInformation(m)
                 if (src != null) {
+                    src = buildPowerAssertMessageInitialization(m) + src
                     trace src
                     m.replace(src)
                 }
@@ -227,10 +218,15 @@ if (%1$s == null) {
         @Override
         void edit(NewExpr e) throws CannotCompileException {
             if (inAssertStatement && e.className == "java.lang.AssertionError") {
-                injectVariableInformation(e)
+                def src = buildPowerAssertMessageInitialization(e)
+                src += buildPowerAssertMessageInjection(e)
+                trace src
+                e.replace(src);
                 inAssertStatement = false;
             }
         }
+
+        // source code builders:
 
         String buildFieldInformation(FieldAccess expr) {
             return String.format(
@@ -250,6 +246,24 @@ try {
                 makeLiteral("${expr.className}.${expr.fieldName}="),
                 inspectExpr('$_', Descriptor.toCtClass(expr.signature, classPool))
             )
+        }
+
+        String buildPowerAssertMessageInitialization(Expr expr) {
+            if (initialized) {
+                return ''
+            }
+            initialized = true
+
+            def lines = fetcher.getLines(expr.enclosingClass, expr.fileName, expr.lineNumber)
+
+            return String.format('''{
+if (%1$s == null) {
+    %1$s = new StringBuilder();
+} else {
+    %1$s.setLength(0);
+}
+%1$s.append(%2$s);
+}''', kPowerAssertMessage, makeLiteral("\n\n" + lines + "\n\n"))
         }
 
         String buildMethodResultInformation(MethodCall expr) {
@@ -342,7 +356,7 @@ try {
          *
          * @param expr the `new AssertionError()` expression
          */
-        void injectVariableInformation(NewExpr expr) {
+        String buildPowerAssertMessageInjection(NewExpr expr) {
             CharSequence localVars = buildVariableTable(expr)
 
             def messagePrefix = new StringBuilder()
@@ -360,8 +374,8 @@ _s.append((Object)%1$s);
 
 $_ = $proceed((Object)_s);
 }''', kPowerAssertMessage, messagePrefix, localVars);
-            trace src
-            expr.replace(src);
+
+            return src
         }
     }
 }
