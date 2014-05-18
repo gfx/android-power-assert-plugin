@@ -13,7 +13,7 @@ import org.gradle.api.Project
 
 public class PowerAssertPlugin implements Plugin<Project> {
     static final String TAG = 'PowerAssert'
-    static final int VERBOSE = Integer.valueOf(System.getenv('POWERASSERT_VERBOSE'))
+    static final int VERBOSE = Integer.valueOf(System.getenv('POWERASSERT_VERBOSE') ?: '0')
 
     static boolean empower = true
 
