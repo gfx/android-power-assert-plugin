@@ -2,6 +2,7 @@ language: android
 before_install:
     - export TERM=dumb # to get clean gradle output
     - export ANDROID_TARGET=android-19
+    - export POWERASSERT_VERBOSE=2
     # setup and run the Android emulator
     - android list targets # for debugging
     - echo no | android create avd --force -n test -t $ANDROID_TARGET -b armeabi-v7a

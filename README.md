@@ -47,6 +47,12 @@ com.github.gfx.powerassert.example.MainActivity.findViewById()=<null>
 (...stacktrace...)
 ```
 
+# Logging
+
+`POWERASSERT_VERBOSE=1` shows debug logs including how the plugin spends time in bytecode modification.
+
+`POWERASSERT_VERBOSE=2` shows all the extra source code so it might be useful to debug this plugin.
+
 # Author And License
 
 Copyright 2014, FUJI Goro (gfx) <gfuji@cpan.org>. All rights reserved.

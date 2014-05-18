@@ -18,7 +18,7 @@ import org.gradle.api.plugins.PluginContainer
 
 class Empower {
     private static final String TAG = PowerAssertPlugin.TAG
-    private static final boolean VERBOSE = PowerAssertPlugin.VERBOSE
+    private static final int VERBOSE = PowerAssertPlugin.VERBOSE
 
     private static final String kPowerAssertMessage = '$powerAssertMessage'
 
@@ -51,7 +51,7 @@ class Empower {
     }
 
     void trace(message) {
-        if (VERBOSE) {
+        if (VERBOSE >= 2) {
             println "[$TAG] $message"
         } else {
             project.logger.trace "[$TAG] $message"
@@ -59,7 +59,7 @@ class Empower {
     }
 
     void info(message) {
-        if (VERBOSE) {
+        if (VERBOSE >= 1) {
             println "[$TAG] $message"
         } else {
             project.logger.info "[$TAG] $message"
