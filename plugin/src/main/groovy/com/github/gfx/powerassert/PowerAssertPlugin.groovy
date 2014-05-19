@@ -32,6 +32,7 @@ public class PowerAssertPlugin implements Plugin<Project> {
         checkAndroidPlugin(project)
 
         BaseExtension android = project.android
+        assert android != null;
 
         android.lintOptions.disable "Assert" // assertions are now reliable
 
@@ -48,11 +49,14 @@ public class PowerAssertPlugin implements Plugin<Project> {
         }
 
         if (android instanceof AppExtension) {
+            assert android.applicationVariants != null
             android.applicationVariants.all { ApplicationVariant variant ->
                 if (isAssertionsEnabled(variant.buildType)) {
+                    assert variant.javaCompile != null
                     variant.javaCompile.doLast {
                         Empower.enablePowerAssert(project, variant, variant.apkLibraries)
                     }
+                    assert variant.testVariant.javaCompile != null
                     variant.testVariant.javaCompile.doLast {
                         List<File> libs = new ArrayList<>(variant.apkLibraries)
                         libs.addAll(variant.testVariant.apkLibraries)
@@ -61,11 +65,14 @@ public class PowerAssertPlugin implements Plugin<Project> {
                 }
             }
         } else if (android instanceof LibraryExtension) {
+            assert android.libraryVariants != null;
             android.libraryVariants.all { LibraryVariant variant ->
                 if (isAssertionsEnabled(variant.buildType)) {
+                    assert variant.javaCompile != null
                     variant.javaCompile.doLast {
                         Empower.enablePowerAssert(project, variant, variant.testVariant.apkLibraries)
                     }
+                    assert variant.testVariant.javaCompile != null
                     variant.testVariant.javaCompile.doLast {
                         Empower.enablePowerAssert(project, variant.testVariant, variant.testVariant.apkLibraries)
                     }
