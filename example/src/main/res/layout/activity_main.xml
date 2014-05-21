@@ -20,7 +20,7 @@
         android:layout_margin="22dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Crash!"
+        android:text="@string/button_crash"
         android:id="@+id/button1"
         android:layout_gravity="center_horizontal"/>
 
@@ -28,7 +28,7 @@
         android:layout_margin="22dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Crash!"
+        android:text="@string/button_crash"
         android:id="@+id/button2"
         android:layout_gravity="center_horizontal"/>
 
@@ -36,7 +36,7 @@
         android:layout_margin="22dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Crash!"
+        android:text="@string/button_crash"
         android:id="@+id/button3"
         android:layout_gravity="center_horizontal"/>
 

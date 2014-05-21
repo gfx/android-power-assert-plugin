@@ -3,6 +3,6 @@
 
     <string name="app_name">Power Assert Demo</string>
     <string name="hello_world">Hello, Power Assert world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="button_crash">Crash!</string>
 
 </resources>
