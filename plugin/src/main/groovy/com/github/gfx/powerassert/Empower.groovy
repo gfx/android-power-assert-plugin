@@ -73,16 +73,17 @@ class Empower {
     private void setupBootClasspath() {
         PluginContainer plugins = project.plugins
         BasePlugin androidPlugin = plugins.findPlugin(AppPlugin) ?: plugins.findPlugin(LibraryPlugin)
-        addLibraries(androidPlugin.bootClasspath)
+        addClassPaths(androidPlugin.bootClasspath)
     }
 
-    public void addLibraries(Collection<?> libraries) {
+    public void addClassPaths(Collection<?> libraries) {
         libraries.each { jar ->
-            File file = project.file(jar)
-            info "appendClassPath: ${file.absolutePath}"
-            classPool.appendClassPath(file.absolutePath)
+            String canonicalPath = project.file(jar).absoluteFile.canonicalPath
+            info "classPath: ${canonicalPath}"
+            classPool.appendClassPath(canonicalPath)
         }
     }
+
 
     public void process(BaseVariant variant) {
         long t0 = System.currentTimeMillis()
@@ -97,8 +98,6 @@ class Empower {
         File buildDir = variant.javaCompile.destinationDir
         String absoluteBuildDir = buildDir.canonicalPath
         info "buildDir=${absoluteBuildDir}"
-
-        classPool.appendClassPath(absoluteBuildDir)
 
         def allCount = 0;
         def processedCount = 0;

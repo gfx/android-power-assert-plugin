@@ -23,7 +23,7 @@ public class LibraryTest extends AndroidTestCase {
         }
     }
 
-    public void testAssertInAntherPackage() throws Exception {
+    public void testAssertInAnotherPackage() throws Exception {
         try {
             LibBar.f(false);
             fail("not reached");
@@ -32,4 +32,12 @@ public class LibraryTest extends AndroidTestCase {
         }
     }
 
+    public void testAssertInAnotherClassInAnotherPackage() throws Exception {
+        try {
+            assert new LibBar().g(false);
+            fail("not reached");
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("LibBar"));
+        }
+    }
 }

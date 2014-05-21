@@ -53,14 +53,17 @@ public class PowerAssertPlugin implements Plugin<Project> {
             android.applicationVariants.all { ApplicationVariant variant ->
                 if (isAssertionsEnabled(variant.buildType)) {
                     def empower = new Empower(project)
+                    empower.addClassPaths(variant.apkLibraries)
+                    empower.addClassPaths([ variant.javaCompile.destinationDir ])
+
                     assert variant.javaCompile != null
                     variant.javaCompile.doLast {
-                        empower.addLibraries(variant.apkLibraries)
                         empower.process(variant)
                     }
                     assert variant.testVariant.javaCompile != null
                     variant.testVariant.javaCompile.doLast {
-                        empower.addLibraries(variant.testVariant.apkLibraries)
+                        empower.addClassPaths(variant.testVariant.apkLibraries)
+                        empower.addClassPaths([ variant.testVariant.javaCompile.destinationDir ])
                         empower.process(variant.testVariant)
                     }
                 }
@@ -70,13 +73,16 @@ public class PowerAssertPlugin implements Plugin<Project> {
             android.libraryVariants.all { LibraryVariant variant ->
                 if (isAssertionsEnabled(variant.buildType)) {
                     def empower = new Empower(project)
+                    empower.addClassPaths([ variant.javaCompile.destinationDir ])
+
                     assert variant.javaCompile != null
                     variant.javaCompile.doLast {
                         empower.process(variant)
                     }
                     assert variant.testVariant.javaCompile != null
                     variant.testVariant.javaCompile.doLast {
-                        empower.addLibraries(variant.testVariant.apkLibraries)
+                        empower.addClassPaths(variant.testVariant.apkLibraries)
+                        empower.addClassPaths([ variant.testVariant.javaCompile.destinationDir ])
                         empower.process(variant.testVariant)
                     }
                 }
