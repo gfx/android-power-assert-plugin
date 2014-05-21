@@ -1,5 +1,8 @@
 # The revision history of android-power-assert-plugin
 
+## v0.10.5 - 2014-05-22 08:26:40+0900
+
+* Fix compilation errors
 
 ## v0.10.4 - 2014-05-18 20:11:17+0900
 

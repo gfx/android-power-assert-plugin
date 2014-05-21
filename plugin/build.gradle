@@ -2,7 +2,7 @@ final REPOSITORY_URL = 'https://github.com/gfx/android-power-assert-plugin'
 
 final GROUP_ID = 'com.github.gfx'
 final ARTIFACT_ID = 'android-power-assert-plugin'
-final VERSION = '0.10.4'
+final VERSION = '0.10.5'
 
 buildscript {
     repositories {
