@@ -1,4 +1,5 @@
 package com.github.gfx.powerassert
+
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BasePlugin
 import com.android.build.gradle.LibraryPlugin
@@ -32,6 +33,7 @@ class Empower {
     private final CtClass runtimeExceptionClass
 
     Empower(Project project) {
+        info("setup $project")
         this.project = project
 
         classPool = new ClassPool(null);
@@ -68,17 +70,24 @@ class Empower {
         }
     }
 
-    public void addLibraries(Collection<File> libraries) {
-        libraries.each { File jar ->
-            info "appendClassPath: ${jar.absolutePath}"
-            classPool.appendClassPath(jar.absolutePath)
+    private void setupBootClasspath() {
+        PluginContainer plugins = project.plugins
+        BasePlugin androidPlugin = plugins.findPlugin(AppPlugin) ?: plugins.findPlugin(LibraryPlugin)
+        addLibraries(androidPlugin.bootClasspath)
+    }
+
+    public void addLibraries(Collection<?> libraries) {
+        libraries.each { jar ->
+            File file = project.file(jar)
+            info "appendClassPath: ${file.absolutePath}"
+            classPool.appendClassPath(file.absolutePath)
         }
     }
 
     public void process(BaseVariant variant) {
         long t0 = System.currentTimeMillis()
 
-        info "processing ${variant.name}"
+        info "processing variant=${variant.name}"
 
         TargetLinesFetcher fetcher = new TargetLinesFetcher(variant.javaCompile.source)
 
@@ -124,14 +133,6 @@ class Empower {
 
         def path = classFile.absolutePath.substring(buildDir.length() + 1 /* for a path separator */)
         return path.substring(0, path.lastIndexOf(".class")).replace("/", ".")
-    }
-
-    private void setupBootClasspath() {
-        PluginContainer plugins = project.plugins
-        BasePlugin androidPlugin = plugins.findPlugin(AppPlugin) ?: plugins.findPlugin(LibraryPlugin)
-        androidPlugin.bootClasspath.each { String androidJar ->
-            classPool.appendClassPath(androidJar)
-        }
     }
 
     private boolean modifyStatements(CtClass c, TargetLinesFetcher fetcher) {

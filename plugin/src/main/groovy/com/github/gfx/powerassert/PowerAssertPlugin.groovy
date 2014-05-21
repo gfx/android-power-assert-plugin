@@ -52,7 +52,7 @@ public class PowerAssertPlugin implements Plugin<Project> {
             assert android.applicationVariants != null
             android.applicationVariants.all { ApplicationVariant variant ->
                 if (isAssertionsEnabled(variant.buildType)) {
-                    def empower = new Empower(project) // share libs in app and test
+                    def empower = new Empower(project)
                     assert variant.javaCompile != null
                     variant.javaCompile.doLast {
                         empower.addLibraries(variant.apkLibraries)
