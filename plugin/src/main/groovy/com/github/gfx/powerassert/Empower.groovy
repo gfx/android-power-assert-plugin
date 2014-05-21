@@ -33,8 +33,8 @@ class Empower {
     private final CtClass runtimeExceptionClass
 
     Empower(Project project) {
-        info("setup $project")
         this.project = project
+        info("setup $project")
 
         classPool = new ClassPool(null);
         classPool.appendSystemPath();
