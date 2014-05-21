@@ -162,6 +162,16 @@ public class AssertTest extends AndroidTestCase {
         }
     }
 
+    public void testAssertInAnotherClassInAnotherPackage() throws Exception {
+        try {
+            assert new Baz().g(false);
+            fail("not reached");
+        } catch (AssertionError e) {
+            assert e.getMessage().contains("Baz");
+        }
+    }
+
+
     public void testWithAnonClass() throws Exception {
         final int value = 42 + this.hashCode();
 

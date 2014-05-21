@@ -52,15 +52,16 @@ public class PowerAssertPlugin implements Plugin<Project> {
             assert android.applicationVariants != null
             android.applicationVariants.all { ApplicationVariant variant ->
                 if (isAssertionsEnabled(variant.buildType)) {
+                    def empower = new Empower(project) // share libs in app and test
                     assert variant.javaCompile != null
                     variant.javaCompile.doLast {
-                        Empower.enablePowerAssert(project, variant, variant.apkLibraries)
+                        empower.addLibraries(variant.apkLibraries)
+                        empower.process(variant)
                     }
                     assert variant.testVariant.javaCompile != null
                     variant.testVariant.javaCompile.doLast {
-                        List<File> libs = new ArrayList<>(variant.apkLibraries)
-                        libs.addAll(variant.testVariant.apkLibraries)
-                        Empower.enablePowerAssert(project, variant.testVariant, libs)
+                        empower.addLibraries(variant.testVariant.apkLibraries)
+                        empower.process(variant.testVariant)
                     }
                 }
             }
@@ -68,13 +69,15 @@ public class PowerAssertPlugin implements Plugin<Project> {
             assert android.libraryVariants != null;
             android.libraryVariants.all { LibraryVariant variant ->
                 if (isAssertionsEnabled(variant.buildType)) {
+                    def empower = new Empower(project)
                     assert variant.javaCompile != null
                     variant.javaCompile.doLast {
-                        Empower.enablePowerAssert(project, variant, variant.testVariant.apkLibraries)
+                        empower.process(variant)
                     }
                     assert variant.testVariant.javaCompile != null
                     variant.testVariant.javaCompile.doLast {
-                        Empower.enablePowerAssert(project, variant.testVariant, variant.testVariant.apkLibraries)
+                        empower.addLibraries(variant.testVariant.apkLibraries)
+                        empower.process(variant.testVariant)
                     }
                 }
             }

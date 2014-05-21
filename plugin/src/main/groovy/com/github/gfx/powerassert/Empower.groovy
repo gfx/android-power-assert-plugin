@@ -1,5 +1,4 @@
 package com.github.gfx.powerassert
-
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BasePlugin
 import com.android.build.gradle.LibraryPlugin
@@ -12,7 +11,6 @@ import javassist.CtMethod
 import javassist.bytecode.*
 import javassist.expr.*
 import org.apache.commons.lang3.StringEscapeUtils
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.plugins.PluginContainer
 
@@ -28,26 +26,20 @@ class Empower {
     static List<String> DEPENDENCIES = ['org.apache.commons:commons-lang3:+']
 
     private final Project project;
-    private final BaseVariant variant;
-    private final Collection<File> libraries;
 
     private final ClassPool classPool
     private final CtClass stringBuilderClass
     private final CtClass runtimeExceptionClass
 
-    Empower(Project project, BaseVariant variant, Collection<File> libraries) {
+    Empower(Project project) {
         this.project = project
-        this.variant = variant;
-        this.libraries = libraries;
 
         classPool = new ClassPool(null);
         classPool.appendSystemPath();
         stringBuilderClass = classPool.getCtClass("java.lang.StringBuilder")
         runtimeExceptionClass = classPool.getCtClass("java.lang.RuntimeException")
-    }
 
-    static void enablePowerAssert(Project project, BaseVariant variant, Collection<File> libraries) {
-        new Empower(project, variant, libraries).execute()
+        setupBootClasspath()
     }
 
     void trace(message) {
@@ -76,41 +68,33 @@ class Empower {
         }
     }
 
-    void execute() {
+    public void addLibraries(Collection<File> libraries) {
+        libraries.each { File jar ->
+            info "appendClassPath: ${jar.absolutePath}"
+            classPool.appendClassPath(jar.absolutePath)
+        }
+    }
+
+    public void process(BaseVariant variant) {
         long t0 = System.currentTimeMillis()
 
         info "processing ${variant.name}"
-
-        setupClasspath()
-
-        File buildDir = variant.javaCompile.destinationDir
 
         TargetLinesFetcher fetcher = new TargetLinesFetcher(variant.javaCompile.source)
 
         classPool.importPackage("org.apache.commons.lang3.builder")
         classPool.importPackage("org.apache.commons.lang3")
 
+        File buildDir = variant.javaCompile.destinationDir
         String absoluteBuildDir = buildDir.canonicalPath
-        info "buildDir=$absoluteBuildDir"
+        info "buildDir=${absoluteBuildDir}"
 
         classPool.appendClassPath(absoluteBuildDir)
 
         def allCount = 0;
         def processedCount = 0;
 
-        def classFiles = new ArrayList<File>()
-        buildDir.eachFileRecurse(FileType.FILES) { File file ->
-            if (file.name.endsWith(".class")) {
-                classFiles.add(file)
-            }
-        }
-
-        classFiles.collect { File classFile ->
-            assert classFile.absolutePath.startsWith(absoluteBuildDir)
-
-            def path = classFile.absolutePath.substring(absoluteBuildDir.length() + 1 /* for a path separator */)
-            path.substring(0, path.lastIndexOf(".class")).replace("/", ".")
-        }.each { className ->
+        getClassNamesInDirectory(buildDir).each { className ->
             final long t1 = System.currentTimeMillis()
             CtClass c = classPool.getCtClass(className)
             if (modifyStatements(c, fetcher)) {
@@ -124,29 +108,29 @@ class Empower {
         info("Processed $processedCount/$allCount classes, elapsed ${System.currentTimeMillis() - t0}ms")
     }
 
-    private void setupClasspath() {
+    private List<String> getClassNamesInDirectory(File dir) {
+        def classNames = new ArrayList<String>()
+        dir.eachFileRecurse(FileType.FILES) { File file ->
+            if (file.name.endsWith(".class")) {
+                def className = classFileToClassName(dir.canonicalPath, file)
+                classNames.add(className)
+            }
+        }
+        return classNames
+    }
+
+    private String classFileToClassName(String buildDir, File classFile) {
+        assert classFile.absolutePath.startsWith(buildDir)
+
+        def path = classFile.absolutePath.substring(buildDir.length() + 1 /* for a path separator */)
+        return path.substring(0, path.lastIndexOf(".class")).replace("/", ".")
+    }
+
+    private void setupBootClasspath() {
         PluginContainer plugins = project.plugins
         BasePlugin androidPlugin = plugins.findPlugin(AppPlugin) ?: plugins.findPlugin(LibraryPlugin)
         androidPlugin.bootClasspath.each { String androidJar ->
             classPool.appendClassPath(androidJar)
-        }
-
-        boolean hasCommonsLang3 = false
-        libraries.each { File jar ->
-            info "appendClassPath: ${jar.absolutePath}"
-            classPool.appendClassPath(jar.absolutePath)
-
-            if (jar.name.startsWith("commons-lang3")) {
-                hasCommonsLang3 = true
-            }
-        }
-        if (!hasCommonsLang3) {
-            String depsDecl = """
-dependencies {
-    ${variant.name}Compile ${this.class.simpleName}.DEPENDENCIES
-}
-"""
-            throw new GradleException("[BUG] Missing libraries. You can specify them in dependencies: $depsDecl")
         }
     }
 
