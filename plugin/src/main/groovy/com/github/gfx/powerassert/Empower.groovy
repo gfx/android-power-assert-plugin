@@ -324,7 +324,7 @@ try {
                 } else if (type.name == "java.lang.String") {
                     return makeStringLiteral
                 } else if (type.name == "java.lang.Object") {
-                    return "${expr}.getClass() == java.lang.String.class ? ${makeStringLiteral} : ${inspect}"
+                    return "(${expr} != null && ${expr}.getClass() == java.lang.String.class) ? ${makeStringLiteral} : ${inspect}"
                 } else {
                     return inspect
                 }

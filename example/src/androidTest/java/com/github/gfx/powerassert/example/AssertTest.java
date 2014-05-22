@@ -4,6 +4,9 @@ import android.test.AndroidTestCase;
 
 import com.github.gfx.powerassert.example.p.Baz;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AssertTest extends AndroidTestCase {
     public void testAssert() throws Exception {
         try {
@@ -187,5 +190,16 @@ public class AssertTest extends AndroidTestCase {
         } catch (AssertionError e) {
             assertTrue(e.getMessage().contains("value"));
         }
+    }
+
+    public void testNullObject() throws Exception {
+        List<String> list = getSomething();
+        assert list.get(0) == null;
+    }
+
+    private List<String> getSomething() {
+        List<String> list = new ArrayList<>();
+        list.add(null);
+        return list;
     }
 }
