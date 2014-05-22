@@ -52,16 +52,20 @@ public class PowerAssertPlugin implements Plugin<Project> {
             assert android.applicationVariants != null
             android.applicationVariants.all { ApplicationVariant variant ->
                 if (isAssertionsEnabled(variant.buildType)) {
-                    def empower = new Empower(project)
-                    empower.addClassPaths(variant.apkLibraries)
-                    empower.addClassPaths([ variant.javaCompile.destinationDir ])
-
                     assert variant.javaCompile != null
                     variant.javaCompile.doLast {
+                        def empower = new Empower(project)
+                        empower.addClassPaths(variant.apkLibraries)
+                        empower.addClassPaths([ variant.javaCompile.destinationDir ])
+
                         empower.process(variant)
                     }
                     assert variant.testVariant.javaCompile != null
                     variant.testVariant.javaCompile.doLast {
+                        def empower = new Empower(project)
+                        empower.addClassPaths(variant.apkLibraries)
+                        empower.addClassPaths([ variant.javaCompile.destinationDir ])
+
                         empower.addClassPaths(variant.testVariant.apkLibraries)
                         empower.addClassPaths([ variant.testVariant.javaCompile.destinationDir ])
                         empower.process(variant.testVariant)
@@ -72,16 +76,20 @@ public class PowerAssertPlugin implements Plugin<Project> {
             assert android.libraryVariants != null;
             android.libraryVariants.all { LibraryVariant variant ->
                 if (isAssertionsEnabled(variant.buildType)) {
-                    def empower = new Empower(project)
-                    empower.addClassPaths([ variant.javaCompile.destinationDir ])
-
                     assert variant.javaCompile != null
                     variant.javaCompile.doLast {
+                        def empower = new Empower(project)
+                        empower.addClassPaths(variant.testVariant.apkLibraries)
+                        empower.addClassPaths([ variant.javaCompile.destinationDir ])
+
                         empower.process(variant)
                     }
                     assert variant.testVariant.javaCompile != null
                     variant.testVariant.javaCompile.doLast {
+                        def empower = new Empower(project)
                         empower.addClassPaths(variant.testVariant.apkLibraries)
+                        empower.addClassPaths([ variant.javaCompile.destinationDir ])
+
                         empower.addClassPaths([ variant.testVariant.javaCompile.destinationDir ])
                         empower.process(variant.testVariant)
                     }

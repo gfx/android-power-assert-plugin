@@ -10,7 +10,7 @@ public class LibraryTest extends AndroidTestCase {
             LibFoo.f(false);
             fail("not reached");
         } catch (AssertionError e) {
-            assertTrue(e.getMessage().contains("expr"));
+            assert e.getMessage().contains("expr");
         }
     }
 
@@ -28,7 +28,7 @@ public class LibraryTest extends AndroidTestCase {
             LibBar.f(false);
             fail("not reached");
         } catch (AssertionError e) {
-            assertTrue(e.getMessage().contains("expr"));
+            assert e.getMessage().contains("expr");
         }
     }
 
@@ -38,6 +38,15 @@ public class LibraryTest extends AndroidTestCase {
             fail("not reached");
         } catch (AssertionError e) {
             assertTrue(e.getMessage().contains("LibBar"));
+        }
+    }
+
+    public void testRefToObjectInLibrary() throws Exception {
+        try {
+            assert LibFoo.g("bar");
+        }
+        catch (AssertionError e) {
+            assert e.getMessage().contains("LibFoo");
         }
     }
 }
