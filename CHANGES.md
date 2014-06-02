@@ -1,5 +1,9 @@
 # The revision history of android-power-assert-plugin
 
+## v0.10.7 - 2014-06-03 08:06:13+0900
+
+* Fix a compilation error in abstract methods
+
 ## v0.10.6 - 2014-05-22 22:46:02+0900
 
 * Fix a runtime NPE in injected code (#8)
