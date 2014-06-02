@@ -149,10 +149,12 @@ class Empower {
 
         if (modified && PowerAssertPlugin.empower) {
             c.getDeclaredMethods().each { CtMethod method ->
-                method.addLocalVariable(kPowerAssertMessage, stringBuilderClass)
-                method.insertBefore("${kPowerAssertMessage} = null;")
+                if (!method.empty) {
+                    method.addLocalVariable(kPowerAssertMessage, stringBuilderClass)
+                    method.insertBefore("${kPowerAssertMessage} = null;")
 
-                method.instrument(new EditAssertStatement(method, fetcher))
+                    method.instrument(new EditAssertStatement(method, fetcher))
+                }
             }
         }
         return modified;
