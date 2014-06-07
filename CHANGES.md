@@ -1,9 +1,15 @@
 # The revision history of android-power-assert-plugin
 
+## v0.11.0 - 2014-06-08 08:01:42+0900
+
+* Build with Android Gradle Plugin 0.11.+
+* No code change from v0.10.8
+
 ## v0.10.8 - 2014-06-08 07:51:49+0900
 
 * This is the last version that supports Android Gradle Plugin 0.10.+
 * Fix build errors by specifying the minor version of Android Gradle Plugin
+* No code change from v0.10.7
 
 ## v0.10.7 - 2014-06-03 08:06:13+0900
 
