@@ -53,6 +53,13 @@ com.github.gfx.powerassert.example.MainActivity.findViewById()=<null>
 
 `POWERASSERT_VERBOSE=2` shows all the extra source code so it might be useful to debug this plugin.
 
+# Compatibility
+
+The minor version of this plugin should match with the minor version of Android Gradle Plugin.
+
+ hat is, android-power-assert-plugin v0.10.x is compatible with Android Gradle Plugin v0.10.x,
+and android-power-assert-plugin v0.11.x is compatible with Android Gradle Plugin v.11.x.
+
 # Author And License
 
 Copyright 2014, FUJI Goro (gfx) <gfuji@cpan.org>. All rights reserved.
