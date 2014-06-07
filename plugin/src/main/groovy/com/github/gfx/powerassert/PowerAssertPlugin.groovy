@@ -1,9 +1,12 @@
 package com.github.gfx.powerassert
 
-import com.android.build.gradle.*
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.LibraryVariant
-import com.android.builder.DefaultBuildType
 import com.android.builder.model.BuildType
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -42,7 +45,7 @@ public class PowerAssertPlugin implements Plugin<Project> {
             exclude 'META-INF/LICENSE.txt'
         }
 
-        android.buildTypes.all { DefaultBuildType buildType ->
+        android.buildTypes.all { BuildType buildType ->
             if (isAssertionsEnabled(buildType)) {
                 project.dependencies."${buildType.name}Compile"(Empower.DEPENDENCIES)
             }
@@ -56,7 +59,7 @@ public class PowerAssertPlugin implements Plugin<Project> {
                     variant.javaCompile.doLast {
                         def empower = new Empower(project)
                         empower.addClassPaths(variant.apkLibraries)
-                        empower.addClassPaths([ variant.javaCompile.destinationDir ])
+                        empower.addClassPaths([variant.javaCompile.destinationDir])
 
                         empower.process(variant)
                     }
@@ -64,10 +67,10 @@ public class PowerAssertPlugin implements Plugin<Project> {
                     variant.testVariant.javaCompile.doLast {
                         def empower = new Empower(project)
                         empower.addClassPaths(variant.apkLibraries)
-                        empower.addClassPaths([ variant.javaCompile.destinationDir ])
+                        empower.addClassPaths([variant.javaCompile.destinationDir])
 
                         empower.addClassPaths(variant.testVariant.apkLibraries)
-                        empower.addClassPaths([ variant.testVariant.javaCompile.destinationDir ])
+                        empower.addClassPaths([variant.testVariant.javaCompile.destinationDir])
                         empower.process(variant.testVariant)
                     }
                 }
@@ -80,7 +83,7 @@ public class PowerAssertPlugin implements Plugin<Project> {
                     variant.javaCompile.doLast {
                         def empower = new Empower(project)
                         empower.addClassPaths(variant.testVariant.apkLibraries)
-                        empower.addClassPaths([ variant.javaCompile.destinationDir ])
+                        empower.addClassPaths([variant.javaCompile.destinationDir])
 
                         empower.process(variant)
                     }
@@ -88,9 +91,9 @@ public class PowerAssertPlugin implements Plugin<Project> {
                     variant.testVariant.javaCompile.doLast {
                         def empower = new Empower(project)
                         empower.addClassPaths(variant.testVariant.apkLibraries)
-                        empower.addClassPaths([ variant.javaCompile.destinationDir ])
+                        empower.addClassPaths([variant.javaCompile.destinationDir])
 
-                        empower.addClassPaths([ variant.testVariant.javaCompile.destinationDir ])
+                        empower.addClassPaths([variant.testVariant.javaCompile.destinationDir])
                         empower.process(variant.testVariant)
                     }
                 }

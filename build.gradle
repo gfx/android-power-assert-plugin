@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$ANDROID_GRADLE_PLUGIN_VERSION"
-        classpath "com.jakewharton.sdkmanager:gradle-plugin:$ANDROID_GRADLE_PLUGIN_VERSION"
+        classpath "com.jakewharton.sdkmanager:gradle-plugin:0.10.+"
     }
 }
 

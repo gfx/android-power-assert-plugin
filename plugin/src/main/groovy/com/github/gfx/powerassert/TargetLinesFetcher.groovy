@@ -18,7 +18,7 @@ public class TargetLinesFetcher {
         String[] lines = cache.get(c)
         if (lines == null) {
             String sourceFile = c.name.replace(".", "/")
-            sourceFile = sourceFile.substring(0, sourceFile.lastIndexOf("/") + 1) // remote class name
+            sourceFile = sourceFile.substring(0, sourceFile.lastIndexOf("/") + 1)
             sourceFile += baseName
 
             def matched = sourceTree.filter { File f ->
