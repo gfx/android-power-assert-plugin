@@ -1,0 +1,7 @@
+ext.REPOSITORY_URL = 'https://github.com/gfx/android-power-assert-plugin'
+
+ext.GROUP_ID = 'com.github.gfx'
+ext.ARTIFACT_ID = 'android-power-assert-plugin'
+ext.VERSION = '0.10.7'
+
+ext.ANDROID_GRADLE_PLUGIN_VERSION = "0.10.+"

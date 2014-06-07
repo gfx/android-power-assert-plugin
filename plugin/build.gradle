@@ -1,8 +1,4 @@
-final REPOSITORY_URL = 'https://github.com/gfx/android-power-assert-plugin'
-
-final GROUP_ID = 'com.github.gfx'
-final ARTIFACT_ID = 'android-power-assert-plugin'
-final VERSION = '0.10.7'
+apply from: '../metadata.gradle'
 
 buildscript {
     repositories {
@@ -24,7 +20,7 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'com.android.tools.build:gradle:+'
+    compile "com.android.tools.build:gradle:$ANDROID_GRADLE_PLUGIN_VERSION"
 
     compile 'org.javassist:javassist:3.+'
     compile 'org.apache.commons:commons-lang3:+'
