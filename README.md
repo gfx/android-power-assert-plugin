@@ -15,8 +15,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.10.+'
-        classpath 'com.github.gfx:android-power-assert-plugin:0.10.+'
+        classpath 'com.android.tools.build:gradle:0.11.+'
+        classpath 'com.github.gfx:android-power-assert-plugin:0.11.+'
     }
 }
 ```
