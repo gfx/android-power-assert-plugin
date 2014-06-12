@@ -1,7 +1,9 @@
 language: android
+env:
+    - ANDROID_TARGET=android-10
+    - ANDROID_TARGET=android-19
 before_install:
     - export TERM=dumb # to get clean gradle output
-    - export ANDROID_TARGET=android-19
     - export POWERASSERT_VERBOSE=2
     # setup and run the Android emulator
     - android list targets # for debugging
@@ -9,5 +11,4 @@ before_install:
     - emulator -avd test -no-skin -no-audio -no-window &
     - curl -L https://raw.githubusercontent.com/embarkmobile/android-sdk-installer/master/wait_for_emulator | bash
 script:
-    - ./gradlew lint
-    - ./gradlew connectedAndroidTest
+    - ./gradlew connectedCheck
