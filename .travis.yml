@@ -1,13 +1,13 @@
 language: android
 env:
-    - ANDROID_TARGET=android-10
-    - ANDROID_TARGET=android-19
+    - TARGET=android-10 ABI=armeabi
+    - TARGET=android-19 ABI=armeabi-v7a
 before_install:
     - export TERM=dumb # to get clean gradle output
     - export POWERASSERT_VERBOSE=2
     # setup and run the Android emulator
     - android list targets # for debugging
-    - echo no | android create avd --force -n test -t $ANDROID_TARGET
+    - echo no | android create avd --force -n test -t $TARGET -b $ABI
     - emulator -avd test -no-skin -no-audio -no-window &
     - curl -L https://raw.githubusercontent.com/embarkmobile/android-sdk-installer/master/wait_for_emulator | bash
 script:
