@@ -36,7 +36,7 @@ public class TargetLinesFetcher {
         }
         s += String.format('%4d> %s\n', target, lines[target])
         if ((target + 1) < lines.length) {
-            s += String.format('%4d: %s\n', target, lines[target + 1])
+            s += String.format('%4d: %s\n', target + 1, lines[target + 1])
         }
         return s
     }
