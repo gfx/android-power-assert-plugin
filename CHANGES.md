@@ -1,5 +1,10 @@
 # The revision history of android-power-assert-plugin
 
+## v0.12.0 - 2014-07-01 08:01:48+0900
+
+* Build with Android Gradle Plugin 0.12.+
+* Fix line numbers in assertion messages
+
 ## v0.11.0 - 2014-06-08 08:01:42+0900
 
 * Build with Android Gradle Plugin 0.11.+
