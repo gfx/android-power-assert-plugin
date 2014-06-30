@@ -4,6 +4,7 @@ import android.test.AndroidTestCase;
 
 import com.github.gfx.example.lib.p.LibBar;
 
+@SuppressWarnings("Assert")
 public class LibraryTest extends AndroidTestCase {
     public void testAssertInLibs() throws Exception {
         try {
