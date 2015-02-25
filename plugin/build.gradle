@@ -5,13 +5,14 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.+'
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3'
     }
 }
 
 apply plugin: 'groovy'
+
 apply plugin: 'maven'
-apply plugin: 'nexus'
+apply plugin: 'com.bmuschko.nexus'
 
 repositories {
     mavenCentral()
@@ -56,18 +57,17 @@ configurations {
     mavenDeployer
 }
 
-artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
-}
-
 uploadArchives {
     repositories.mavenDeployer {
         pom.groupId = GROUP_ID
         pom.artifactId = ARTIFACT_ID
         pom.version = VERSION
     }
+}
+
+extraArchive {
+    sources = true
+    javadoc = true
 }
 
 modifyPom {
