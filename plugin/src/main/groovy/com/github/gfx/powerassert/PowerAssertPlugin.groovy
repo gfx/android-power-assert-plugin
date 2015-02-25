@@ -1,5 +1,4 @@
 package com.github.gfx.powerassert
-
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BaseExtension
@@ -7,11 +6,11 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.LibraryVariant
+import com.android.build.gradle.api.TestVariant
 import com.android.builder.model.BuildType
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-
 // see http://www.gradle.org/docs/current/userguide/custom_plugins.html
 
 public class PowerAssertPlugin implements Plugin<Project> {
@@ -52,67 +51,80 @@ public class PowerAssertPlugin implements Plugin<Project> {
         }
 
         if (android instanceof AppExtension) {
-            assert android.applicationVariants != null
-            android.applicationVariants.all { ApplicationVariant variant ->
-                if (isAssertionsEnabled(variant.buildType)) {
-                    assert variant.javaCompile != null
-                    variant.javaCompile.doLast {
-                        def empower = new Empower(project)
-                        empower.addClassPaths(variant.apkLibraries)
-                        empower.addClassPaths([variant.javaCompile.destinationDir])
-
-                        empower.process(variant)
-                    }
-                    if (variant.testVariant) {
-                        assert variant.testVariant.javaCompile != null
-                        variant.testVariant.javaCompile.doLast {
-                            def empower = new Empower(project)
-                            empower.addClassPaths(variant.apkLibraries)
-                            empower.addClassPaths([variant.javaCompile.destinationDir])
-
-                            empower.addClassPaths(variant.testVariant.apkLibraries)
-                            empower.addClassPaths([variant.testVariant.javaCompile.destinationDir])
-                            empower.process(variant.testVariant)
-                        }
-                    }
-                }
-            }
+            prepareAppExtension(android)
         } else if (android instanceof LibraryExtension) {
-            assert android.libraryVariants != null;
-            android.libraryVariants.all { LibraryVariant variant ->
-                if (isAssertionsEnabled(variant.buildType)) {
-                    assert variant.javaCompile != null
-                    variant.javaCompile.doLast {
-                        def empower = new Empower(project)
-                        empower.addClassPaths(variant.testVariant.apkLibraries)
-                        empower.addClassPaths([variant.javaCompile.destinationDir])
-
-                        empower.process(variant)
-                    }
-                    if (variant.testVariant) {
-                        assert variant.testVariant.javaCompile != null
-                        variant.testVariant.javaCompile.doLast {
-                            def empower = new Empower(project)
-                            empower.addClassPaths(variant.testVariant.apkLibraries)
-                            empower.addClassPaths([variant.javaCompile.destinationDir])
-
-                            empower.addClassPaths([variant.testVariant.javaCompile.destinationDir])
-                            empower.process(variant.testVariant)
-                        }
-                    }
-                }
-            }
+            prepareLibraryExtension(android)
         } else {
             throw new GradleException("Unknown extension: ${android}");
         }
     }
 
-    private static boolean isAssertionsEnabled(BuildType variant) {
+    static void prepareAppExtension(AppExtension android) {
+        assert android.applicationVariants != null
+        android.applicationVariants.all { ApplicationVariant variant ->
+            if (isAssertionsEnabled(variant.buildType)) {
+                assert variant.javaCompile != null
+                variant.javaCompile.doLast {
+                    def empower = new Empower(project)
+                    empower.addClassPaths([variant.javaCompile.destinationDir])
+                    empower.addClassPaths(variant.apkLibraries)
+
+                    empower.process(variant)
+                }
+            }
+        }
+
+        assert android.testVariants != null
+        android.testVariants.all { TestVariant testVariant ->
+            assert testVariant.javaCompile != null
+            testVariant.javaCompile.doLast {
+                def variant = testVariant.testedVariant as ApplicationVariant
+                def empower = new Empower(project)
+                empower.addClassPaths([variant.javaCompile.destinationDir])
+                empower.addClassPaths(variant.apkLibraries)
+
+                empower.addClassPaths([testVariant.javaCompile.destinationDir])
+                empower.addClassPaths(testVariant.apkLibraries)
+
+                empower.process(testVariant)
+            }
+        }
+    }
+
+    static void prepareLibraryExtension(LibraryExtension android) {
+        assert android.libraryVariants != null;
+        android.libraryVariants.all { LibraryVariant variant ->
+            if (isAssertionsEnabled(variant.buildType)) {
+                assert variant.javaCompile != null
+                variant.javaCompile.doLast {
+                    def empower = new Empower(project)
+                    empower.addClassPaths(variant.testVariant.apkLibraries)
+                    empower.addClassPaths([variant.javaCompile.destinationDir])
+
+                    empower.process(variant)
+                }
+            }
+        }
+        android.testVariants.all { TestVariant testVariant ->
+            assert testVariant.javaCompile != null
+            testVariant.javaCompile.doLast {
+                def variant = testVariant.testedVariant as LibraryVariant
+                def empower = new Empower(project)
+                empower.addClassPaths(testVariant.apkLibraries)
+                empower.addClassPaths([variant.javaCompile.destinationDir])
+
+                empower.addClassPaths([testVariant.javaCompile.destinationDir])
+                empower.process(testVariant)
+            }
+        }
+    }
+
+    static boolean isAssertionsEnabled(BuildType variant) {
         // TODO: make it customizable
         return variant.name != "release"
     }
 
-    private static void checkAndroidPlugin(Project project) {
+    static void checkAndroidPlugin(Project project) {
         if (!(project.plugins.hasPlugin(AppPlugin) || project.plugins.hasPlugin(LibraryPlugin))) {
             throw new GradleException('No android plugin detected')
         }

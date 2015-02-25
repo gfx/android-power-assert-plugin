@@ -4,6 +4,7 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
 import groovy.io.FileType
+import groovy.transform.CompileStatic
 import javassist.CannotCompileException
 import javassist.ClassPool
 import javassist.CtClass
@@ -13,6 +14,7 @@ import javassist.expr.*
 import org.apache.commons.lang3.StringEscapeUtils
 import org.gradle.api.Project
 
+@CompileStatic
 class Empower {
     private static final String TAG = PowerAssertPlugin.TAG
     private static final int VERBOSE = PowerAssertPlugin.VERBOSE
@@ -86,22 +88,22 @@ class Empower {
     public void process(BaseVariant variant) {
         long t0 = System.currentTimeMillis()
 
-        info "processing variant=${variant.name}"
+        info "Processing variant=${variant.name}"
 
-        TargetLinesFetcher fetcher = new TargetLinesFetcher(variant.javaCompile.source)
+        def fetcher = new TargetLinesFetcher(variant.javaCompile.source)
 
         classPool.importPackage("org.apache.commons.lang3.builder")
         classPool.importPackage("org.apache.commons.lang3")
 
-        File buildDir = variant.javaCompile.destinationDir
-        String absoluteBuildDir = buildDir.canonicalPath
+        def buildDir = variant.javaCompile.destinationDir
+        def absoluteBuildDir = buildDir.canonicalPath
         info "buildDir=${absoluteBuildDir}"
 
         def allCount = 0;
         def processedCount = 0;
 
         getClassNamesInDirectory(buildDir).each { className ->
-            final long t1 = System.currentTimeMillis()
+            final t1 = System.currentTimeMillis()
             CtClass c = classPool.getCtClass(className)
             if (modifyStatements(c, fetcher)) {
                 processedCount++
