@@ -7,12 +7,12 @@ before_install:
     - android list targets # for debugging
     - echo no | android create avd --force -n test -t $TARGET -b $ABI
     - emulator -avd test -no-skin -no-audio -no-window &
-    - ./gradlew tasks # install dependencies while the eumulator is booting
+    - ./gradlew --daemon --stacktrace tasks # install dependencies while the eumulator is booting
     - android-wait-for-emulator
 script:
     - export POWERASSERT_VERBOSE=2
-    - ./gradlew --stacktrace lint
+    - ./gradlew --daemon --stacktrace build
     - # export COVERAGE=true
-    - ./gradlew --stacktrace connectedCheck || (adb logcat -t 100 '*:E' && false)
+    - ./gradlew --daemon --stacktrace connectedCheck || (adb logcat -t 100 '*:E' && false)
 after_script:
     - android delete avd -n test
