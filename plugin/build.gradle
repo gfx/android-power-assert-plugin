@@ -23,8 +23,8 @@ dependencies {
     compile localGroovy()
     compile "com.android.tools.build:gradle:1.1.0"
 
-    compile 'org.javassist:javassist:3.+'
-    compile 'org.apache.commons:commons-lang3:+'
+    compile 'org.javassist:javassist:[3,4)'
+    compile 'org.apache.commons:commons-lang3:[3,4)'
 }
 
 // artifact settings
