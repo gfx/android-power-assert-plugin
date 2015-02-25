@@ -39,6 +39,8 @@ String git(String command) {
 }
 
 task('releng') {
+    description = "create a tag and push it to the remote origin"
+
     doLast {
         def gitStatus = git("status --porcelain")
         if (gitStatus.trim()) {

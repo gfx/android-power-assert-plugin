@@ -15,8 +15,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.11.+'
-        classpath 'com.github.gfx:android-power-assert-plugin:0.11.+'
+        classpath 'com.android.tools.build:gradle:1.1.0'
+        classpath 'com.github.gfx:android-power-assert-plugin:1.1.0'
     }
 }
 ```
@@ -57,8 +57,8 @@ com.github.gfx.powerassert.example.MainActivity.findViewById()=<null>
 
 The minor version of this plugin should match with the minor version of Android Gradle Plugin.
 
- hat is, android-power-assert-plugin v0.10.x is compatible with Android Gradle Plugin v0.10.x,
-and android-power-assert-plugin v0.11.x is compatible with Android Gradle Plugin v.11.x.
+That is, android-power-assert-plugin v0.10.x is compatible with Android Gradle Plugin v0.10.x,
+as well as android-power-assert-plugin v1.1.x is compatible with Android Gradle Plugin v1.1.x.
 
 # Author And License
 

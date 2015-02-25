@@ -17,4 +17,5 @@ allprojects {
 }
 
 task('uploadArchives') {
+    description = "upload artifacts '${GROUP_ID}:${ARTIFACT_ID}:${VERSION}'"
 }
