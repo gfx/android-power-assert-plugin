@@ -20,7 +20,7 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile "com.android.tools.build:gradle:$ANDROID_GRADLE_PLUGIN_VERSION"
+    compile "com.android.tools.build:gradle:1.1.0"
 
     compile 'org.javassist:javassist:3.+'
     compile 'org.apache.commons:commons-lang3:+'

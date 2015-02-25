@@ -63,15 +63,17 @@ public class PowerAssertPlugin implements Plugin<Project> {
 
                         empower.process(variant)
                     }
-                    assert variant.testVariant.javaCompile != null
-                    variant.testVariant.javaCompile.doLast {
-                        def empower = new Empower(project)
-                        empower.addClassPaths(variant.apkLibraries)
-                        empower.addClassPaths([variant.javaCompile.destinationDir])
+                    if (variant.testVariant) {
+                        assert variant.testVariant.javaCompile != null
+                        variant.testVariant.javaCompile.doLast {
+                            def empower = new Empower(project)
+                            empower.addClassPaths(variant.apkLibraries)
+                            empower.addClassPaths([variant.javaCompile.destinationDir])
 
-                        empower.addClassPaths(variant.testVariant.apkLibraries)
-                        empower.addClassPaths([variant.testVariant.javaCompile.destinationDir])
-                        empower.process(variant.testVariant)
+                            empower.addClassPaths(variant.testVariant.apkLibraries)
+                            empower.addClassPaths([variant.testVariant.javaCompile.destinationDir])
+                            empower.process(variant.testVariant)
+                        }
                     }
                 }
             }
@@ -87,14 +89,16 @@ public class PowerAssertPlugin implements Plugin<Project> {
 
                         empower.process(variant)
                     }
-                    assert variant.testVariant.javaCompile != null
-                    variant.testVariant.javaCompile.doLast {
-                        def empower = new Empower(project)
-                        empower.addClassPaths(variant.testVariant.apkLibraries)
-                        empower.addClassPaths([variant.javaCompile.destinationDir])
+                    if (variant.testVariant) {
+                        assert variant.testVariant.javaCompile != null
+                        variant.testVariant.javaCompile.doLast {
+                            def empower = new Empower(project)
+                            empower.addClassPaths(variant.testVariant.apkLibraries)
+                            empower.addClassPaths([variant.javaCompile.destinationDir])
 
-                        empower.addClassPaths([variant.testVariant.javaCompile.destinationDir])
-                        empower.process(variant.testVariant)
+                            empower.addClassPaths([variant.testVariant.javaCompile.destinationDir])
+                            empower.process(variant.testVariant)
+                        }
                     }
                 }
             }

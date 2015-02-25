@@ -1,27 +1,17 @@
 package com.github.gfx.powerassert
-
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.BasePlugin
-import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
 import groovy.io.FileType
 import javassist.CannotCompileException
 import javassist.ClassPool
 import javassist.CtClass
 import javassist.CtMethod
-import javassist.bytecode.CodeAttribute
-import javassist.bytecode.Descriptor
-import javassist.bytecode.LineNumberAttribute
-import javassist.bytecode.LocalVariableAttribute
-import javassist.bytecode.MethodInfo
-import javassist.expr.Expr
-import javassist.expr.ExprEditor
-import javassist.expr.FieldAccess
-import javassist.expr.MethodCall
-import javassist.expr.NewExpr
+import javassist.bytecode.*
+import javassist.expr.*
 import org.apache.commons.lang3.StringEscapeUtils
 import org.gradle.api.Project
-import org.gradle.api.plugins.PluginContainer
 
 class Empower {
     private static final String TAG = PowerAssertPlugin.TAG
@@ -79,9 +69,9 @@ class Empower {
     }
 
     private void setupBootClasspath() {
-        PluginContainer plugins = project.plugins
-        BasePlugin androidPlugin = plugins.findPlugin(AppPlugin) ?: plugins.findPlugin(LibraryPlugin)
-        addClassPaths(androidPlugin.bootClasspath)
+        def extensions = project.extensions
+        BaseExtension androidExtension = extensions.findByType(AppExtension) ?: extensions.findByType(LibraryExtension)
+        addClassPaths(androidExtension.bootClasspath)
     }
 
     public void addClassPaths(Collection<?> libraries) {
