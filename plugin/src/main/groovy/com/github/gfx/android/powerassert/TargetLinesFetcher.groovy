@@ -1,4 +1,4 @@
-package com.github.gfx.powerassert
+package com.github.gfx.android.powerassert
 
 import javassist.CtClass
 import org.gradle.api.file.FileTree

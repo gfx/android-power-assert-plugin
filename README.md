@@ -1,8 +1,17 @@
-# Android Power Assert [![Build Status](https://travis-ci.org/gfx/android-power-assert-plugin.svg?branch=master)](https://travis-ci.org/gfx/android-power-assert-plugin)
+# Power Assert for Android [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.gfx.powerassert/plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.gfx.powerassert/plugin) [![Circle CI](https://circleci.com/gh/gfx/android-power-assert-plugin.svg?style=svg&branch=master)](https://circleci.com/gh/gfx/android-power-assert-plugin)
 
-Power Assert is a language extension which adds extra information when assertions fail. This feature has been invented in Groovy and being spread around other programming languages, and is becoming a fundamental feature for debugging and testing, especially in unit tests: you no longer need to learn a bunch of test matchers such as [assertEquals()](http://developer.android.com/reference/junit/framework/Assert.html).
+**Power Assert** is a language extension which adds extra information when assertions fail.
+This feature has been invented in Groovy and being spread around other programming languages,
+and is becoming a fundamental feature for debugging and testing, especially in unit tests: you
+no longer need to learn a bunch of test matchers such as
+[assertEquals()](http://developer.android.com/reference/junit/framework/Assert.html).
 
-This library, `android-power-assert`, is a Gradle plugin to provide power asserts to Android by editing Java class files in compilation phases. To use power assert, all you have to do is to depend on `android-power-assert-plugin` and apply `android-power-assert` plugin in `build.gradle`, which automatically enables `assert` statements unless you makes `release` build. Thus you can use [assert statements](http://docs.oracle.com/javase/8/docs/technotes/guides/language/assert.html) both in applications and unit tests.
+This is a Gradle plugin to provide Android with power asserts by modifying Java class files
+in compilation phases. To use power assert, all you have to do is to depend on
+`android-power-assert-plugin` and apply `android-power-assert` plugin in `build.gradle`,
+which automatically enables `assert` statements unless you makes `release` build. Thus you can use
+ [assert statements](http://docs.oracle.com/javase/8/docs/technotes/guides/language/assert.html)
+ both in applications and unit tests.
 
 # Usage
 
@@ -15,8 +24,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.0'
-        classpath 'com.github.gfx:android-power-assert-plugin:1.1.0'
+        classpath 'com.android.tools.build:gradle:1.1.+'
+        classpath 'com.github.gfx.android.powerassert:plugin:1.1.+'
     }
 }
 ```
@@ -24,7 +33,7 @@ buildscript {
 ```groovy
 // in a build.gradle of a module
 apply plugin: 'android'
-apply plugin: 'android-power-assert'
+apply plugin: 'com.github.gfx.android.powerassert'
 ```
 
 Then, use `assert` in your program:
@@ -64,7 +73,7 @@ as well as android-power-assert-plugin v1.1.x is compatible with Android Gradle 
 
 Copyright 2014, FUJI Goro (gfx) <gfuji@cpan.org>. All rights reserved.
 
-This library may be copied only under the terms of the Apache License 2.0, which may be found in the distribution.
+This library may be copied only under the terms of the MIT License.
 
 # See Also
 

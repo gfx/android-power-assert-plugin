@@ -1,5 +1,5 @@
 ext.REPOSITORY_URL = 'https://github.com/gfx/android-power-assert-plugin'
 
-ext.GROUP_ID = 'com.github.gfx'
-ext.ARTIFACT_ID = 'android-power-assert-plugin'
-ext.VERSION = '1.1.0'
+ext.GROUP_ID = 'com.github.gfx.android.powerassert'
+ext.ARTIFACT_ID = 'plugin'
+ext.VERSION = '1.1.1'

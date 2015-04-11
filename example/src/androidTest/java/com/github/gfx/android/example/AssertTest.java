@@ -1,8 +1,8 @@
-package com.github.gfx.powerassert.example;
+package com.github.gfx.android.example;
 
 import android.test.AndroidTestCase;
 
-import com.github.gfx.powerassert.example.p.Baz;
+import com.github.gfx.android.example.p.Baz;
 
 import java.util.ArrayList;
 import java.util.List;

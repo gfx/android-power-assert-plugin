@@ -9,7 +9,11 @@ WORKDIR $PROJECT
 
 ADD . $PROJECT
 
-RUN echo "sdk.dir=$ANDROID_HOME" > local.properties
-RUN ./gradlew --stacktrace androidDependencies
+RUN echo yes | android update sdk -a -u -t sys-img-x86_64-android-22 && \
+    echo no | android create avd --force -n test -t android-22 && \
+    echo "sdk.dir=$ANDROID_HOME" > local.properties && \
+    ./gradlew --stacktrace dependencies
 
-CMD ./gradlew --stacktrace test build
+CMD emulator -avd test -no-skin -no-audio -no-window & ; \
+    ./android-wait-for-emulator && \
+    ./gradlew --stacktrace build connectedAndroidTest

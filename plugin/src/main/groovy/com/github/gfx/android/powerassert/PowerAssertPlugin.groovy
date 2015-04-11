@@ -1,4 +1,4 @@
-package com.github.gfx.powerassert
+package com.github.gfx.android.powerassert
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin

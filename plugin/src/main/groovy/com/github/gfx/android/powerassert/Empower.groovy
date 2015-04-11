@@ -1,4 +1,4 @@
-package com.github.gfx.powerassert
+package com.github.gfx.android.powerassert
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
@@ -10,9 +10,6 @@ import javassist.bytecode.*
 import javassist.expr.*
 import org.apache.commons.lang3.StringEscapeUtils
 import org.gradle.api.Project
-
-import static com.github.gfx.powerassert.PowerAssertPlugin.TAG
-import static com.github.gfx.powerassert.PowerAssertPlugin.VERBOSE
 
 class Empower {
     private static final String kPowerAssertMessage = '$powerAssertMessage'
@@ -41,18 +38,18 @@ class Empower {
     }
 
     void trace(message) {
-        if (VERBOSE >= 2) {
-            println "[$TAG] $message"
+        if (PowerAssertPlugin.VERBOSE >= 2) {
+            println "[$PowerAssertPlugin.TAG] $message"
         } else {
-            project.logger.trace "[$TAG] $message"
+            project.logger.trace "[$PowerAssertPlugin.TAG] $message"
         }
     }
 
     void info(message) {
-        if (VERBOSE >= 1) {
-            println "[$TAG] $message"
+        if (PowerAssertPlugin.VERBOSE >= 1) {
+            println "[$PowerAssertPlugin.TAG] $message"
         } else {
-            project.logger.info "[$TAG] $message"
+            project.logger.info "[$PowerAssertPlugin.TAG] $message"
         }
     }
 

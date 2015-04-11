@@ -1,4 +1,4 @@
-package com.github.gfx.powerassert.example;
+package com.github.gfx.android.example;
 
 import android.app.Activity;
 import android.os.Bundle;

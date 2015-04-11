@@ -1,4 +1,4 @@
-package com.github.gfx.powerassert.example;
+package com.github.gfx.android.example;
 
 public class Foo {
     private boolean bar = false;
@@ -10,7 +10,7 @@ public class Foo {
     }
 
     public static void f(boolean expr) {
-        assert expr : "expects foo.value to be true";
+        assert expr : "expects expr to be true";
     }
 
     public static void g(boolean expr) {
