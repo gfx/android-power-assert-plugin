@@ -1,4 +1,5 @@
 package com.github.gfx.powerassert
+
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BaseExtension
@@ -11,11 +12,12 @@ import com.android.builder.model.BuildType
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+
 // see http://www.gradle.org/docs/current/userguide/custom_plugins.html
 
 public class PowerAssertPlugin implements Plugin<Project> {
-    static final String TAG = 'PowerAssert'
-    static final int VERBOSE = Integer.valueOf(System.getenv('POWERASSERT_VERBOSE') ?: '0')
+    public static final String TAG = 'PowerAssert'
+    public static final int VERBOSE = Integer.valueOf(System.getenv('POWERASSERT_VERBOSE') ?: '0')
 
     static boolean empower = true
 
@@ -121,7 +123,7 @@ public class PowerAssertPlugin implements Plugin<Project> {
 
     static boolean isAssertionsEnabled(BuildType variant) {
         // TODO: make it customizable
-        return variant.name != "release"
+        return variant.debuggable
     }
 
     static void checkAndroidPlugin(Project project) {

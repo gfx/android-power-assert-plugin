@@ -1,24 +1,20 @@
 package com.github.gfx.powerassert
+
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
 import groovy.io.FileType
-import groovy.transform.CompileStatic
-import javassist.CannotCompileException
-import javassist.ClassPool
-import javassist.CtClass
-import javassist.CtMethod
+import javassist.*
 import javassist.bytecode.*
 import javassist.expr.*
 import org.apache.commons.lang3.StringEscapeUtils
 import org.gradle.api.Project
 
-@CompileStatic
-class Empower {
-    private static final String TAG = PowerAssertPlugin.TAG
-    private static final int VERBOSE = PowerAssertPlugin.VERBOSE
+import static com.github.gfx.powerassert.PowerAssertPlugin.TAG
+import static com.github.gfx.powerassert.PowerAssertPlugin.VERBOSE
 
+class Empower {
     private static final String kPowerAssertMessage = '$powerAssertMessage'
 
     /**
@@ -60,23 +56,13 @@ class Empower {
         }
     }
 
-    @SuppressWarnings("unused")
-    void growl(String title, String message) {
-        info(message)
-        project.logger.info("[$title] $message")
-        def process = ["osascript", "-e", "display notification \"${message}\" with title \"${title}\""].execute()
-        if (process.waitFor() != 0) {
-            println "[WARNING] ${process.err.text.trim()}"
-        }
-    }
-
     private void setupBootClasspath() {
         def extensions = project.extensions
         BaseExtension androidExtension = extensions.findByType(AppExtension) ?: extensions.findByType(LibraryExtension)
         addClassPaths(androidExtension.bootClasspath)
     }
 
-    public void addClassPaths(Collection<?> libraries) {
+    public void addClassPaths(Collection<File> libraries) {
         libraries.each { jar ->
             String canonicalPath = project.file(jar).absoluteFile.canonicalPath
             info "classPath: ${canonicalPath}"
@@ -216,7 +202,7 @@ class Empower {
 
         String buildFieldInformation(FieldAccess expr) {
             return String.format(
-                '''{
+                    '''{
 try {
   $_ = $proceed($$);
 } catch (NullPointerException e) {
@@ -228,9 +214,9 @@ try {
 %1$s.append(%3$s);
 %1$s.append("\\n");
 }''',
-                kPowerAssertMessage,
-                makeLiteral("${expr.className}.${expr.fieldName}="),
-                inspectExpr('$_', Descriptor.toCtClass(expr.signature, classPool))
+                    kPowerAssertMessage,
+                    makeLiteral("${expr.className}.${expr.fieldName}="),
+                    inspectExpr('$_', Descriptor.toCtClass(expr.signature, classPool))
             )
         }
 
@@ -258,7 +244,7 @@ if (%1$s == null) {
                 return null
             }
             return String.format(
-                '''{
+                    '''{
 try {
   $_ = $proceed($$);
 } catch (NullPointerException e) {
@@ -270,9 +256,9 @@ try {
 %1$s.append(%3$s);
 %1$s.append("\\n");
 }''',
-                kPowerAssertMessage,
-                makeLiteral("${expr.className}.${expr.methodName}()="),
-                inspectExpr('$_', returnType)
+                    kPowerAssertMessage,
+                    makeLiteral("${expr.className}.${expr.methodName}()="),
+                    inspectExpr('$_', returnType)
             )
         }
 

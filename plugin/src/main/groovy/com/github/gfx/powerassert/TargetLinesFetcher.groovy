@@ -1,10 +1,8 @@
 package com.github.gfx.powerassert
 
-import groovy.transform.CompileStatic
 import javassist.CtClass
 import org.gradle.api.file.FileTree
 
-@CompileStatic
 public class TargetLinesFetcher {
     private final FileTree sourceTree
 
