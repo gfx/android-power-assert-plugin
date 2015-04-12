@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
             public Boolean call(LayoutInflater arg) {
                 return arg.getContext() == null;
             }
-        }.call(getLayoutInflater());
+        }.call(getLayoutInflater()) : "complex assertions";
     }
 
     interface Function<ArgT, ResultT> {
