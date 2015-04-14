@@ -1,4 +1,4 @@
-# Power Assert for Android [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.gfx.powerassert/plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.gfx.powerassert/plugin) [![Circle CI](https://circleci.com/gh/gfx/android-power-assert-plugin.svg?style=svg&branch=master)](https://circleci.com/gh/gfx/android-power-assert-plugin)
+# Power Assert for Android [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.gfx.android.powerassert/plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.gfx.android.powerassert/plugin) [![Circle CI](https://circleci.com/gh/gfx/android-power-assert-plugin.svg?style=svg&branch=master)](https://circleci.com/gh/gfx/android-power-assert-plugin)
 
 **Power Assert** is a language extension which adds extra information when assertions fail.
 This feature has been invented in Groovy and being spread around other programming languages,
@@ -58,9 +58,9 @@ com.github.gfx.powerassert.example.MainActivity.findViewById()=<null>
 
 # Logging
 
-`POWERASSERT_VERBOSE=1` shows debug logs including how the plugin spends time in bytecode modification.
+`POWERASSERT\_VERBOSE=1` shows debug logs including how the plugin spends time in bytecode modification.
 
-`POWERASSERT_VERBOSE=2` shows all the extra source code so it might be useful to debug this plugin.
+`POWERASSERT\_VERBOSE=2` shows all the extra source code so it might be useful to debug this plugin.
 
 # Compatibility
 
