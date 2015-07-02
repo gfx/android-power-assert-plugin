@@ -28,7 +28,6 @@ android {
 
 
 dependencies {
-    compile 'com.jakewharton:butterknife:+'
-
-    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.jakewharton:butterknife:7.0.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
 }
