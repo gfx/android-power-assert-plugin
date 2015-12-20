@@ -77,5 +77,5 @@ This library may be copied only under the terms of the MIT License.
 
 # See Also
 
-- [Groovy 1.7 Power Assert (Posted on December 11, 2009)](http://dontmindthelanguage.wordpress.com/2009/12/11/groovy-1-7-power-assert/)
-- [Power Assert in JavaScript](https://github.com/twada/power-assert)
+- [Groovy 1.7 Power Assert (Posted on December 11, 2009)](https://dontmindthelanguage.wordpress.com/2009/12/11/groovy-1-7-power-assert/)
+- [Power Assert in JavaScript](https://github.com/power-assert-js/power-assert)
