@@ -1,5 +1,10 @@
 # The revision history of android-power-assert-plugin
 
+## v1.5.0 - 2015/12/21
+
+* Build with Android Gradle Plugin 1.5.0
+* Fix crashes when dependencies include `assert`
+
 ## v0.12.0 - 2014-07-01 08:01:48+0900
 
 * Build with Android Gradle Plugin 0.12.+
