@@ -1,8 +1,10 @@
 package com.github.gfx.android.powerassert
 
+import groovy.transform.CompileStatic
 import javassist.CtClass
 import org.gradle.api.file.FileTree
 
+@CompileStatic
 public class TargetLinesFetcher {
     private final FileTree sourceTree
 
@@ -15,6 +17,22 @@ public class TargetLinesFetcher {
     public String getLines(CtClass c, String baseName, int targetLineNumber) {
         int target = targetLineNumber - 1 // line number is 1-origin
 
+        String[] lines = findLines(c, baseName)
+
+        def s = new StringBuilder()
+        if ((target - 1) >= 0 && lines[target - 1] != null) {
+            s += String.format('%4d: %s\n', target - 1, lines[target - 1])
+        }
+        if (lines[target] != null) {
+            s += String.format('%4d> %s\n', target, lines[target])
+        }
+        if ((target + 1) < lines.length && lines[target + 1] != null) {
+            s += String.format('%4d: %s\n', target + 1, lines[target + 1])
+        }
+        return s
+    }
+
+    String[] findLines(CtClass c, String baseName) {
         String[] lines = cache.get(c)
         if (lines == null) {
             String sourceFile = c.name.replace(".", "/")
@@ -24,20 +42,14 @@ public class TargetLinesFetcher {
             def matched = sourceTree.filter { File f ->
                 f.absolutePath.endsWith(sourceFile)
             }
+            if (!matched) {
+                return new String[0]
+            }
             assert !matched.empty
             File file = matched.singleFile
             lines = file.text.split('\n')
             cache.put(c, lines)
         }
-
-        def s = ""
-        if ((target - 1) >= 0) {
-            s += String.format('%4d: %s\n', target - 1, lines[target - 1])
-        }
-        s += String.format('%4d> %s\n', target, lines[target])
-        if ((target + 1) < lines.length) {
-            s += String.format('%4d: %s\n', target + 1, lines[target + 1])
-        }
-        return s
+        return lines;
     }
 }

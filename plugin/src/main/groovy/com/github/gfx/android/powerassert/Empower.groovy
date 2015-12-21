@@ -73,7 +73,8 @@ class Empower {
 
         info "Processing variant=${variant.name}"
 
-        def fetcher = new TargetLinesFetcher(variant.javaCompile.source)
+        // FIXME: it can't handle library source files
+        def fetcher = new TargetLinesFetcher(variant.javaCompiler.source)
 
         classPool.importPackage("org.apache.commons.lang3.builder")
         classPool.importPackage("org.apache.commons.lang3")
@@ -110,7 +111,7 @@ class Empower {
         return classNames
     }
 
-    private String classFileToClassName(String buildDir, File classFile) {
+    private static String classFileToClassName(String buildDir, File classFile) {
         assert classFile.absolutePath.startsWith(buildDir)
 
         def path = classFile.absolutePath.substring(buildDir.length() + 1 /* for a path separator */)
