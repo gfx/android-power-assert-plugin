@@ -42,10 +42,9 @@ public class TargetLinesFetcher {
             def matched = sourceTree.filter { File f ->
                 f.absolutePath.endsWith(sourceFile)
             }
-            if (!matched) {
+            if (!matched.empty) {
                 return new String[0]
             }
-            assert !matched.empty
             File file = matched.singleFile
             lines = file.text.split('\n')
             cache.put(c, lines)
