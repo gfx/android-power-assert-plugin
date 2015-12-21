@@ -21,15 +21,15 @@ public class TargetLinesFetcher {
 
         def s = new StringBuilder()
         if ((target - 1) >= 0 && lines[target - 1] != null) {
-            s += String.format('%4d: %s\n', target - 1, lines[target - 1])
+            s.append(String.format('%4d: %s\n', target - 1, lines[target - 1]))
         }
         if (lines[target] != null) {
-            s += String.format('%4d> %s\n', target, lines[target])
+            s.append(String.format('%4d> %s\n', target, lines[target]))
         }
         if ((target + 1) < lines.length && lines[target + 1] != null) {
-            s += String.format('%4d: %s\n', target + 1, lines[target + 1])
+            s.append(String.format('%4d: %s\n', target + 1, lines[target + 1]))
         }
-        return s
+        return s.toString()
     }
 
     String[] findLines(CtClass c, String baseName) {
