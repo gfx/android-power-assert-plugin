@@ -1,4 +1,4 @@
-FROM gfx2015/android-with-emulator:latest
+FROM gfx2015/android:latest
 
 MAINTAINER FUJI Goro <g.psy.va@gmail.com>
 
@@ -13,4 +13,4 @@ RUN echo "sdk.dir=$ANDROID_HOME" > local.properties && \
     ./gradlew --stacktrace dependencies
 
 CMD start-emulator && \
-    ./gradlew --stacktrace build connectedAndroidTest
+    ./gradlew --stacktrace check
