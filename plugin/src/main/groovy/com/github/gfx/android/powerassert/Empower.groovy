@@ -5,19 +5,21 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
 import groovy.io.FileType
+import groovy.transform.CompileStatic
 import javassist.*
 import javassist.bytecode.*
 import javassist.expr.*
 import org.apache.commons.lang3.StringEscapeUtils
 import org.gradle.api.Project
 
+@CompileStatic
 class Empower {
     private static final String kPowerAssertMessage = '$powerAssertMessage'
 
     /**
      * Runtime libraries this plugin depends on
      */
-    static List<String> DEPENDENCIES = ['org.apache.commons:commons-lang3:+']
+    static List<String> DEPENDENCIES = ['org.apache.commons:commons-lang3:3.4']
 
     private final Project project;
 
