@@ -78,7 +78,7 @@ class Empower {
         classPool.importPackage("org.apache.commons.lang3.builder")
         classPool.importPackage("org.apache.commons.lang3")
 
-        def buildDir = variant.javaCompile.destinationDir
+        def buildDir = variant.javaCompiler.destinationDir
         def absoluteBuildDir = buildDir.canonicalPath
         info "buildDir=${absoluteBuildDir}"
 
