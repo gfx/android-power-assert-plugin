@@ -13,5 +13,4 @@ ADD . $PROJECT
 RUN echo "sdk.dir=$ANDROID_HOME" > local.properties && \
     ./gradlew --stacktrace dependencies
 
-CMD start-emulator && \
-    ./gradlew --stacktrace check
+CMD ./gradlew --stacktrace check
