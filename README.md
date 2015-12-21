@@ -24,8 +24,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.+'
-        classpath 'com.github.gfx.android.powerassert:plugin:1.1.+'
+        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.github.gfx.android.powerassert:plugin:1.5.0'
     }
 }
 ```
@@ -58,9 +58,9 @@ com.github.gfx.powerassert.example.MainActivity.findViewById()=<null>
 
 # Logging
 
-`POWERASSERT\_VERBOSE=1` shows debug logs including how the plugin spends time in bytecode modification.
+`POWERASSERT_VERBOSE=1` shows debug logs including how the plugin spends time in bytecode modification.
 
-`POWERASSERT\_VERBOSE=2` shows all the extra source code so it might be useful to debug this plugin.
+`POWERASSERT_VERBOSE=2` shows all the extra source code so it might be useful to debug this plugin.
 
 # Compatibility
 
