@@ -2,6 +2,7 @@ FROM gfx2015/android:latest
 
 MAINTAINER FUJI Goro <g.psy.va@gmail.com>
 
+ENV JAVA_OPTS -Xmx2048m
 ENV PROJECT /project
 
 RUN mkdir $PROJECT
