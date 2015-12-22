@@ -21,11 +21,11 @@ This plugin uses `assert` statements in Java by applying this plugin in `build.g
 // in the root build.gradle
 buildscript {
     repositories {
-        mavenCentral()
+        mavenCentral() // or jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'com.github.gfx.android.powerassert:plugin:1.5.0'
+        classpath 'com.android.tools.build:gradle:1.5.1'
+        classpath 'com.github.gfx.android.powerassert:plugin:1.5.1'
     }
 }
 ```
