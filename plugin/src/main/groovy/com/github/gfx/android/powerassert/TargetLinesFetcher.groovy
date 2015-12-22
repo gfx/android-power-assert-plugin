@@ -18,15 +18,16 @@ public class TargetLinesFetcher {
         int target = targetLineNumber - 1 // line number is 1-origin
 
         String[] lines = findLines(c, baseName)
+        if (lines == null) {
+            return "";
+        }
 
         def s = new StringBuilder()
-        if ((target - 1) >= 0 && lines[target - 1] != null) {
+        if ((target - 1) >= 0) {
             s.append(String.format('%4d: %s\n', target - 1, lines[target - 1]))
         }
-        if (lines[target] != null) {
-            s.append(String.format('%4d> %s\n', target, lines[target]))
-        }
-        if ((target + 1) < lines.length && lines[target + 1] != null) {
+        s.append(String.format('%4d> %s\n', target, lines[target]))
+        if ((target + 1) < lines.length) {
             s.append(String.format('%4d: %s\n', target + 1, lines[target + 1]))
         }
         return s.toString()
@@ -42,8 +43,8 @@ public class TargetLinesFetcher {
             def matched = sourceTree.filter { File f ->
                 f.absolutePath.endsWith(sourceFile)
             }
-            if (!matched.empty) {
-                return new String[0]
+            if (matched.empty) {
+                return null;
             }
             File file = matched.singleFile
             lines = file.text.split('\n')
