@@ -24,8 +24,8 @@ buildscript {
         mavenCentral() // or jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.1'
-        classpath 'com.github.gfx.android.powerassert:plugin:1.5.1'
+        classpath 'com.android.tools.build:gradle:1.5.2'
+        classpath 'com.github.gfx.android.powerassert:plugin:1.5.2'
     }
 }
 ```
