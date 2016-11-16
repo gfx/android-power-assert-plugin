@@ -2,7 +2,7 @@ apply from: '../metadata.gradle'
 
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'com.bmuschko:gradle-nexus-plugin:2.3'
@@ -15,13 +15,13 @@ apply plugin: 'maven'
 apply plugin: 'com.bmuschko.nexus'
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile "com.android.tools.build:gradle:1.5.0"
+    compile "com.android.tools.build:gradle:2.2.2"
 
     compile 'org.javassist:javassist:[3,4)'
     compile 'org.apache.commons:commons-lang3:[3,4)'
