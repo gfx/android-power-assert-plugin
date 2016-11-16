@@ -5,14 +5,15 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
 import groovy.io.FileType
-import groovy.transform.CompileStatic
-import javassist.*
+import javassist.CannotCompileException
+import javassist.ClassPool
+import javassist.CtClass
+import javassist.CtMethod
 import javassist.bytecode.*
 import javassist.expr.*
 import org.apache.commons.lang3.StringEscapeUtils
 import org.gradle.api.Project
 
-@CompileStatic
 class Empower {
     private static final String kPowerAssertMessage = '$powerAssertMessage'
 
@@ -102,7 +103,7 @@ class Empower {
         info("Processed $processedCount/$allCount classes, elapsed ${System.currentTimeMillis() - t0}ms")
     }
 
-    private List<String> getClassNamesInDirectory(File dir) {
+    private static List<String> getClassNamesInDirectory(File dir) {
         def classNames = new ArrayList<String>()
         dir.eachFileRecurse(FileType.FILES) { File file ->
             if (file.name.endsWith(".class")) {
